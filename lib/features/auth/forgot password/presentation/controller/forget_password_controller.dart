@@ -147,6 +147,7 @@ class ForgetPasswordController extends GetxController {
       body: body,
       header: header,
     );
+    print("kdljfd");
 
     if (response.statusCode == 200) {
       simpleDialog();
