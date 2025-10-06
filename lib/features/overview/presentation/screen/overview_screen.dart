@@ -353,8 +353,8 @@ class OverviewScreen extends StatelessWidget {
                     activeColor: AppColors.primaryColor,
                     activeTrackColor: AppColors.red100,
                     inactiveThumbColor: AppColors.gray,
-                    trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
-                    thumbIcon: MaterialStateProperty.all(
+                    trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+                    thumbIcon: WidgetStateProperty.all(
                       Icon(
                         Icons.circle,
                         size: 40,
@@ -415,7 +415,7 @@ class OverviewScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
           contentPadding: EdgeInsets.all(24.w),
-          content: Container(
+          content: SizedBox(
             width: 300.w,
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -512,7 +512,7 @@ class OverviewScreen extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: CommonText(text: AppString.select_month, fontSize: 18.sp, fontWeight: FontWeight.w600),
-          content: Container(
+          content: SizedBox(
             width: double.minPositive,
             child: ListView.builder(
               shrinkWrap: true,
@@ -544,7 +544,7 @@ class OverviewScreen extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: CommonText(text: 'Select Year', fontSize: 18.sp, fontWeight: FontWeight.w600),
-          content: Container(
+          content: SizedBox(
             width: double.minPositive,
             child: ListView.builder(
               shrinkWrap: true,

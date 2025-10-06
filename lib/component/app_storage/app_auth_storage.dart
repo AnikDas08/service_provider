@@ -9,6 +9,9 @@ class AppAuthStorage {
   Future<void> setToken(String value) async {
     await box.write(StorageKey.token, value);
   }
+  Future<void> setRole(String value) async {
+    await box.write(StorageKey.role, value);
+  }
 
   Future<void> setLanguageValue(String value) async {
     await box.write(StorageKey.language, value);

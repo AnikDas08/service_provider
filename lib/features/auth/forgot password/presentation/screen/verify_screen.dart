@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/features/auth/change_password/widget/popup_dialog.dart';
 import 'package:haircutmen_user_app/utils/extensions/extension.dart';
 import '../../../../../component/button/common_button.dart';
 import '../../../../../component/text/common_text.dart';
@@ -131,7 +132,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                           ),
 
                           /// Resent OTP or show Timer
-                          GestureDetector(
+                          /*GestureDetector(
                             onTap:
                                 controller.time == '00:00'
                                     ? () {
@@ -148,7 +149,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                               bottom: 20,
                               fontWeight: FontWeight.w400,
                             ),
-                          ),
+                          ),*/
 
                           ///  Submit Button here
                           CommonButton(

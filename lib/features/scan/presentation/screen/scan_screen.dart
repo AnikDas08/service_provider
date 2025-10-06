@@ -21,19 +21,19 @@ class QRScannerScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20.r),
         child: SafeArea(
           child: Column(
             children: [
               CustomAppBar(title: "Scan",showBackButton: false,),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               CommonText(
                 text: "Please Scan Your QR Code",
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
                 color: AppColors.black400,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
               // QR Scanner View
               Expanded(
@@ -55,25 +55,23 @@ class QRScannerScreen extends StatelessWidget {
                           cutOutSize: MediaQuery.of(context).size.width * 0.7,
                         ),
                       )
-                          : const Center(
+                          : Center(
                         child: Text(
                           "Scanner is paused",
-                          style: TextStyle(fontSize: 16, color: Colors.black54),
+                          style: TextStyle(fontSize: 16.sp, color: Colors.black54),
                         ),
                       );
                     }),
                   ),
                 ),
               ),
-
-
               const SizedBox(height: 40),
 
               // Scan Button
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 40),
-                width: 217,
-                height: 48,
+                width: 217.w,
+                height: 48.h,
                 child: ElevatedButton(
                   onPressed: () {
                     // You can add manual trigger functionality here
@@ -92,8 +90,8 @@ class QRScannerScreen extends StatelessWidget {
                     children: [
                       Image.asset(
                         'assets/icons/scan_icon.svg', // Add your scan icon asset
-                        height: 20,
-                        width: 20,
+                        height: 20.h,
+                        width: 20.w,
                         color: Colors.white,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(
@@ -116,14 +114,12 @@ class QRScannerScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
               Row(
                 children: [
                   Container(
-                    height: 2,
-                    width: 158,
+                    height: 2.h,
+                    width: 158.w,
                     color: AppColors.black50,
                   ),
                   SizedBox(width: 10,),

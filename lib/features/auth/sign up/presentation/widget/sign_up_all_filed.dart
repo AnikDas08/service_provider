@@ -78,6 +78,15 @@ class SignUpAllField extends StatelessWidget {
                 controller.passwordController,
               ),
         ),
+
+        const CommonText(text: AppString.referal_code_text, fontSize: 14, fontWeight: FontWeight.w400,color: AppColors.black400),
+        SizedBox(height: 6,),
+        CommonTextField(
+          hintText: AppString.referal_code_hint,
+          hintTextColor: AppColors.black100,
+          controller: controller.referralController,
+          validator: OtherHelper.validator,
+        ),
       ],
     );
   }

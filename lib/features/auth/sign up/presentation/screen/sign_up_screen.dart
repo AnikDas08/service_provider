@@ -76,7 +76,9 @@ class SignUpScreen extends StatelessWidget {
                           CommonButton(
                             titleText: AppString.continue_button,
                             isLoading: controller.isLoading,
-                            onTap: ()=>Get.toNamed(AppRoutes.verifyUser),
+                            onTap: (){
+                              controller.signUpUser();
+                            },
                           ),
                           24.height,
             

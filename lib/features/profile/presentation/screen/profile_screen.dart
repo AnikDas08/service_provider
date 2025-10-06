@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:haircutmen_user_app/features/profile/presentation/screen/personal_information.dart';
-import 'package:haircutmen_user_app/services/storage/storage_keys.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:haircutmen_user_app/utils/constants/app_colors.dart';
 import '../../../../../config/route/app_routes.dart';
-import '../../../../component/image/common_image.dart';
 import '../../../../component/other_widgets/item.dart';
 import '../../../../component/text/common_text.dart';
 import '../controller/profile_controller.dart';
-import '../../../../../utils/constants/app_images.dart';
 import '../../../../../utils/constants/app_string.dart';
 
 class ProfileScreen extends StatelessWidget {

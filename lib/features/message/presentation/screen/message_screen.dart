@@ -12,6 +12,8 @@ import '../../data/model/chat_message_model.dart';
 import '../controller/message_controller.dart';
 
 class MessageScreen extends StatelessWidget {
+  const MessageScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final ChatControllers controller = Get.put(ChatControllers());
@@ -248,7 +250,7 @@ class MessageScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Grid
-            Container(
+            SizedBox(
               width: 220.w,
               child: GridView.builder(
                 shrinkWrap: true,

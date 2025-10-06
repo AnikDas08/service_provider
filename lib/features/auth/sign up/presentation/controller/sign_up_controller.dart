@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/component/app_storage/app_auth_storage.dart';
+import 'package:haircutmen_user_app/component/app_storage/storage_key.dart';
 import 'package:intl_phone_field/countries.dart';
 import 'package:haircutmen_user_app/utils/helpers/other_helper.dart';
 
@@ -21,14 +23,13 @@ class SignUpController extends GetxController {
   bool isLoading = false;
   bool isLoadingVerify = false;
 
-  Timer? _timer;
-  int start = 0;
+  //Timer? _timer;
+  //int start = 0;
 
-  String time = "";
+  //String time = "";
 
   List selectedOption = ["User", "Consultant"];
 
-  String selectRole = "User";
   String countryCode = "+880";
   String? image;
 
@@ -43,10 +44,10 @@ class SignUpController extends GetxController {
     text: kDebugMode ? "developernaimul00@gmail.com" : '',
   );
   TextEditingController passwordController = TextEditingController(
-    text: kDebugMode ? 'hello123' : '',
+    text: kDebugMode ? 'asdfghjk9' : '',
   );
   TextEditingController confirmPasswordController = TextEditingController(
-    text: kDebugMode ? 'hello123' : '',
+    text: kDebugMode ? 'asdfghjk9' : '',
   );
   TextEditingController phoneNumberController = TextEditingController(
     text: kDebugMode ? '1865965581' : '',
@@ -57,10 +58,13 @@ class SignUpController extends GetxController {
   TextEditingController locationController = TextEditingController(
     text: kDebugMode ? 'Dhaka' : '',
   );
+  TextEditingController referralController = TextEditingController(
+    text: kDebugMode ? '23456' : '',
+  );
 
   @override
   void dispose() {
-    _timer?.cancel();
+    //_timer?.cancel();
     super.dispose();
   }
 
@@ -68,10 +72,6 @@ class SignUpController extends GetxController {
     countryCode = value.dialCode.toString();
   }
 
-  setSelectedRole(value) {
-    selectRole = value;
-    update();
-  }
 
   openGallery() async {
     image = await OtherHelper.openGallery();
@@ -80,33 +80,38 @@ class SignUpController extends GetxController {
 
   signUpUser() async {
     if (!signUpFormKey.currentState!.validate()) return;
-    Get.toNamed(AppRoutes.verifyUser);
-    return;
+    //Get.toNamed(AppRoutes.verifyUser);
     isLoading = true;
     update();
     Map<String, String> body = {
-      "fullName": nameController.text,
-      "email": emailController.text,
-      "phoneNumber": phoneNumberController.text,
-      "countryCode": countryCode,
+      "role":"PROVIDER",
+      "name":nameController.text,
+      "email":emailController.text,
+      "contact":phoneNumberController.text,
+      "location":locationController.text,
       "password": passwordController.text,
-      "role": selectRole.toLowerCase(),
+      "referralCode":referralController.text,
     };
 
     var response = await ApiService.post(ApiEndPoint.signUp, body: body);
 
     if (response.statusCode == 200) {
       var data = response.data;
-      signUpToken = data['data']['signUpToken'];
+      //signUpToken = data['data']['signUpToken'];
       Get.toNamed(AppRoutes.verifyUser);
-    } else {
+    } else if(response.statusCode==409) {
+      Get.offAllNamed(AppRoutes.signIn);
+      Get.snackbar(
+          response.statusCode.toString(), "User Already Exist, Need Signinn");
+    }
+    else {
       Utils.errorSnackBar(response.statusCode.toString(), response.message);
     }
     isLoading = false;
     update();
   }
 
-  void startTimer() {
+  /*void startTimer() {
     _timer?.cancel(); // Cancel any existing timer
     start = 180; // Reset the start value
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -122,26 +127,29 @@ class SignUpController extends GetxController {
         _timer?.cancel();
       }
     });
-  }
+  }*/
 
   Future<void> verifyOtpRepo() async {
-    Get.offAllNamed(AppRoutes.signIn);
-    return;
+    //Get.offAllNamed(AppRoutes.signIn);
+    //return;
 
     isLoadingVerify = true;
     update();
-    Map<String, String> body = {"otp": otpController.text};
+    print("email is : ${emailController.text}");
+    print("otp is : ${otpController.text}");
+    Map<String, String> body = {"email": emailController.text,"oneTimeCode": otpController.text};
     Map<String, String> header = {"SignUpToken": "signUpToken $signUpToken"};
     var response = await ApiService.post(
-      ApiEndPoint.verifyEmail,
+      ApiEndPoint.verifyUser,
       body: body,
       header: header,
     );
 
     if (response.statusCode == 200) {
       var data = response.data;
+      Get.offAllNamed(AppRoutes.signIn);
 
-      LocalStorage.token = data['data']["accessToken"];
+      /*LocalStorage.token = data['data']["accessToken"];
       LocalStorage.userId = data['data']["attributes"]["_id"];
       LocalStorage.myImage = data['data']["attributes"]["image"];
       LocalStorage.myName = data['data']["attributes"]["fullName"];
@@ -153,14 +161,15 @@ class SignUpController extends GetxController {
       LocalStorage.setString(LocalStorageKeys.userId, LocalStorage.userId);
       LocalStorage.setString(LocalStorageKeys.myImage, LocalStorage.myImage);
       LocalStorage.setString(LocalStorageKeys.myName, LocalStorage.myName);
-      LocalStorage.setString(LocalStorageKeys.myEmail, LocalStorage.myEmail);
+      LocalStorage.setString(LocalStorageKeys.myEmail, LocalStorage.myEmail);*/
 
       // if (LocalStorage.myRole == 'consultant') {
       //   Get.toNamed(AppRoutes.personalInformation);
       // } else {
       //   Get.offAllNamed(AppRoutes.patientsHome);
       // }
-    } else {
+    }
+    else {
       Get.snackbar(response.statusCode.toString(), response.message);
     }
 

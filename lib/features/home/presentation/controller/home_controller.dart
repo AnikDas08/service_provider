@@ -5,7 +5,6 @@ import 'package:haircutmen_user_app/features/home/data/model/booking_model.dart'
 
 import '../../../../component/text/common_text.dart';
 import '../../../../utils/constants/app_colors.dart';
-import '../screen/home_screen.dart';
 
 class HomeController extends GetxController {
   // Online status

@@ -194,7 +194,7 @@ class CompleteProfileScreen extends StatelessWidget {
                   if (index < controller.servicePairs.length - 1) SizedBox(height: 16.h),
                 ],
               );
-            }).toList(),
+            }),
           ],
         )),
 
@@ -619,7 +619,7 @@ class CompleteProfileScreen extends StatelessWidget {
             ),
             child: controller.uploadedImages.isEmpty
                 ? // Show upload prompt when no images
-            Container(
+            SizedBox(
               height: 66.h,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

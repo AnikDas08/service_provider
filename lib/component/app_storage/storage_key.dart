@@ -2,6 +2,7 @@ class StorageKey {
   StorageKey._();
   static const String onBoarding = "onBoarding";
   static const String token = "accessToken";
+  static const String role = "PROVIDER";
   static const String chatID = "chatID";
   static const String notificationId = "notificationId";
   static const String deviceIDfirebase = "deviceIDfirebase";

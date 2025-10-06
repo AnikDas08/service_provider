@@ -13,7 +13,6 @@ import '../../../../../../utils/constants/app_colors.dart';
 import '../../../../../../utils/constants/app_string.dart';
 import '../../../../../../utils/helpers/other_helper.dart';
 import '../widgets/do_not_account.dart';
-import '../widgets/social_sign_in.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});

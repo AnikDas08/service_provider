@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:haircutmen_user_app/component/text/common_text.dart';
 import 'package:haircutmen_user_app/component/text_field/common_text_field.dart';
-import 'package:haircutmen_user_app/config/route/app_routes.dart';
 import 'package:haircutmen_user_app/features/profile/presentation/controller/edit_service_controller.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -317,7 +316,7 @@ class EditServiceScreen extends StatelessWidget {
                   if (index < controller.servicePairs.length - 1) SizedBox(height: 16.h),
                 ],
               );
-            }).toList(),
+            }),
           ],
         )),
 

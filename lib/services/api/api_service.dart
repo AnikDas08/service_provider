@@ -118,6 +118,7 @@ class ApiService {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.sendTimeout:
+        print("Timeout Error: ${error.message}");
         return ApiResponseModel(408, {"message": AppString.requestTimeOut});
 
       case DioExceptionType.badResponse:
@@ -166,6 +167,5 @@ Dio _getMyDio() {
       },
     ),
   );
-
   return dio;
 }

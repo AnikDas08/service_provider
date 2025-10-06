@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/features/auth/forgot%20password/presentation/controller/forget_password_controller.dart';
 
 import '../../../../../component/text/common_text.dart';
 import '../../../../../config/route/app_routes.dart';
 import '../../../../../utils/constants/app_string.dart';
 import '../../../home/widget/home_custom_button.dart';
-import '../../forgot password/presentation/controller/forget_password_controller.dart';
 
 simpleDialog() async {
   // Store the current context before showing dialog

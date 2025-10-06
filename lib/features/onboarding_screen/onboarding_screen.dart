@@ -9,7 +9,6 @@ import '../../component/button/common_button.dart';
 import '../../component/image/common_image.dart';
 import '../../component/text/common_text.dart';
 import '../../utils/constants/app_images.dart';
-import '../auth/sign in/presentation/widgets/social_sign_in.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});

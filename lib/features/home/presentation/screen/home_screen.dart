@@ -75,7 +75,7 @@ class HomeScreen extends StatelessWidget {
                             activeTrackColor: AppColors.primaryColor.withOpacity(0.3),
                             inactiveThumbColor: Colors.grey[400],
                             inactiveTrackColor: Colors.grey[300],
-                            trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+                            trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
                           ),
                         ],
                       ),

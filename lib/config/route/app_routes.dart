@@ -1,10 +1,8 @@
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/features/auth/sign%20up/presentation/screen/complete_profile_screen.dart';
 import 'package:haircutmen_user_app/features/home/presentation/screen/canceldetails_screen.dart';
-import 'package:haircutmen_user_app/features/home/presentation/screen/service_details_screen.dart';
 import 'package:haircutmen_user_app/features/home/presentation/screen/viewdetails_pending.dart';
 import 'package:haircutmen_user_app/features/home/presentation/screen/viewdetailse_upcomming.dart';
-import 'package:haircutmen_user_app/features/overview/presentation/controller/overview_controller.dart';
 import 'package:haircutmen_user_app/features/overview/presentation/screen/overview_screen.dart';
 import 'package:haircutmen_user_app/features/profile/presentation/screen/contracts_screen.dart';
 import 'package:haircutmen_user_app/features/profile/presentation/screen/edit_service_screen.dart';

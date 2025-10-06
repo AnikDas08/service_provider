@@ -17,14 +17,14 @@ class SignInController extends GetxController {
     text: kDebugMode ? 'developernaimul00@gmail.com' : '',
   );
   TextEditingController passwordController = TextEditingController(
-    text: kDebugMode ? 'hello123' : "",
+    text: kDebugMode ? 'asdfghjk9' : "",
   );
 
   /// Sign in Api call here
 
   Future<void> signInUser() async {
-    Get.toNamed(AppRoutes.complete_profile_screen);
-    return;
+    //Get.toNamed(AppRoutes.complete_profile_screen);
+    //return;
 
     isLoading = true;
     update();
@@ -41,6 +41,8 @@ class SignInController extends GetxController {
 
     if (response.statusCode == 200) {
       var data = response.data;
+
+      Get.offAllNamed(AppRoutes.complete_profile_screen);
 
       LocalStorage.token = data['data']["accessToken"];
       LocalStorage.userId = data['data']["attributes"]["_id"];
@@ -65,6 +67,7 @@ class SignInController extends GetxController {
 
       emailController.clear();
       passwordController.clear();
+
     } else {
       Get.snackbar(response.statusCode.toString(), response.message);
     }

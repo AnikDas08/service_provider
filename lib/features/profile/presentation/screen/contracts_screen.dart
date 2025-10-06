@@ -14,6 +14,8 @@ import '../../../../utils/constants/app_string.dart';
 import '../../../message/data/model/chat_message_model.dart';
 
 class ContractsScreen extends StatelessWidget {
+  const ContractsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final ContractController controller = Get.put(ContractController());
@@ -237,7 +239,7 @@ class ContractsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Grid
-            Container(
+            SizedBox(
               width: 220.w,
               child: GridView.builder(
                 shrinkWrap: true,

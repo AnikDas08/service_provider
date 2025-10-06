@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import '../../../../../config/route/app_routes.dart';
-import '../../../../../utils/extensions/extension.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../component/pop_up/common_pop_menu.dart';
-import '../../../../component/text/common_text.dart';
 import '../controller/setting_controller.dart';
 import '../../../../../utils/constants/app_colors.dart';
 import '../../../../../utils/constants/app_string.dart';

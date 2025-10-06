@@ -1,11 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:haircutmen_user_app/features/home/data/model/booking_model.dart';
 
-import '../../../../component/text/common_text.dart';
-import '../../../../utils/constants/app_colors.dart';
-import '../screen/home_screen.dart';
 
 class PendingViewDetailsController extends GetxController {
   // Online status
@@ -15,10 +9,6 @@ class PendingViewDetailsController extends GetxController {
   int selectedFilter = 0;
 
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   // Toggle online status
   void toggleOnlineStatus() {

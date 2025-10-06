@@ -162,7 +162,7 @@ class OverviewController extends GetxController {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(AppString.start_time, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-        content: Container(
+        content: SizedBox(
           width: double.minPositive,
           height: 300,
           child: ListView.builder(
@@ -189,7 +189,7 @@ class OverviewController extends GetxController {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(AppString.end_time, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-        content: Container(
+        content: SizedBox(
           width: double.minPositive,
           height: 300,
           child: ListView.builder(

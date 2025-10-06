@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:haircutmen_user_app/utils/extensions/extension.dart';
 import '../../../../../component/button/common_button.dart';
 import '../../../../../component/text/common_text.dart';
@@ -21,7 +22,7 @@ class _VerifyUserState extends State<VerifyUser> {
 
   @override
   void initState() {
-    SignUpController.instance.startTimer();
+    //SignUpController.instance.startTimer();
     super.initState();
   }
 
@@ -36,6 +37,7 @@ class _VerifyUserState extends State<VerifyUser> {
               child: Column(
                 children: [
                   /// Logo text here
+                  CustomAppBar(title: "",),
                   const CommonText(
                     text: AppString.logoText,
                     fontSize: 24,
@@ -128,7 +130,7 @@ class _VerifyUserState extends State<VerifyUser> {
                             ),
 
                             /// Resent OTP or show Timer
-                            GestureDetector(
+                            /*GestureDetector(
                               onTap:
                                   controller.time == '00:00'
                                       ? () {
@@ -145,7 +147,7 @@ class _VerifyUserState extends State<VerifyUser> {
                                 bottom: 20,
                                 fontWeight: FontWeight.w400,
                               ),
-                            ),
+                            ),*/
 
                             ///  Submit Button here
                             CommonButton(

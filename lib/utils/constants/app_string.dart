@@ -107,6 +107,8 @@ class AppString {
   /// Sign Up Text
   static const String signup_text = "Sign Up";
   static const String name_text = "Full Name";
+  static const String referal_code_text = "Referral Code";
+  static const String referal_code_hint = "Enter Your Referral Code....";
   static const String hints_name = "Enter Your Full Name...";
   static const String phone_number_text = "Phone Number";
   static const String hint_phone_number = "7674334";
