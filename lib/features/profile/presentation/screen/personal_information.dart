@@ -8,6 +8,7 @@ import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:haircutmen_user_app/utils/constants/app_colors.dart';
 
 import '../../../../utils/constants/app_string.dart';
+import '../controller/profile_controller.dart';
 
 class PersonalInformationScreen extends StatelessWidget {
   const PersonalInformationScreen({super.key});
@@ -15,62 +16,67 @@ class PersonalInformationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomAppBar(title: AppString.personal_information,),
-              SizedBox(height: 30,),
-              Center(
-                child: CircleAvatar(
-                  radius: 60.sp,
-                  backgroundColor: Colors.transparent,
-                  child: Image.asset(
-                    "assets/images/profile_image.png",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              SizedBox(height: 26,),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(14),
-                constraints: BoxConstraints(),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow:[
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
+      body:GetBuilder<ProfileController>(
+        init: ProfileController(),
+        builder: (controller) => Container(
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomAppBar(title: AppString.personal_information,),
+                  SizedBox(height: 30,),
+                  Center(
+                    child: CircleAvatar(
+                      radius: 60.sp,
+                      backgroundColor: Colors.transparent,
+                      child: Image.asset(
+                        "assets/images/profile_image.png",
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ]
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    InformationRow(title: AppString.full_name,value: "Sohidul Islam",),
-                    SizedBox(height: 12),
-                    InformationRow(title: AppString.email,value: "sohidul@gmail.com",),
-                    SizedBox(height: 12),
-                    InformationRow(title: AppString.contact,value: "787859767856",),
-                    SizedBox(height: 12),
-                    InformationRow(title: AppString.location,value: "Dhaka,Bangladesh",),
-                    SizedBox(height: 12),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 26,),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(14),
+                    constraints: BoxConstraints(),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow:[
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ]
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InformationRow(title: AppString.full_name,value: controller.profileData?.name??"",),
+                        SizedBox(height: 12),
+                        InformationRow(title: AppString.email,value: controller.profileData?.email??"",),
+                        SizedBox(height: 12),
+                        InformationRow(title: AppString.contact,value: controller.profileData?.contact??"",),
+                        SizedBox(height: 12),
+                        InformationRow(title: AppString.location,value: controller.profileData?.location??"",),
+                        SizedBox(height: 12),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20.h,),
+                  CustomButton
+                    (text: AppString.edit_profile_button,
+                      isSelected: true,
+                      onTap: (){
+                      Get.toNamed(AppRoutes.editProfile);
+                      })
+                ],
               ),
-              SizedBox(height: 20.h,),
-              CustomButton
-                (text: AppString.edit_profile_button,
-                  isSelected: true,
-                  onTap: (){
-                  Get.toNamed(AppRoutes.editProfile);
-                  })
-            ],
+            ),
           ),
         ),
       )

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/component/app_storage/app_auth_storage.dart';
 import '../../../../../config/route/app_routes.dart';
 import '../../../../../services/api/api_service.dart';
 import '../../../../../config/api/api_end_point.dart';
@@ -30,6 +31,7 @@ class SignInController extends GetxController {
     update();
 
     Map<String, String> body = {
+      "role":"PROVIDER",
       "email": emailController.text,
       "password": passwordController.text,
     };
@@ -42,28 +44,18 @@ class SignInController extends GetxController {
     if (response.statusCode == 200) {
       var data = response.data;
 
-      Get.offAllNamed(AppRoutes.complete_profile_screen);
+      AppAuthStorage().setToken(data['data']["accessToken"]);
+      AppAuthStorage().setLogin("djfkldfd");
+
+      Get.offAllNamed(AppRoutes.homeNav);
+
+      Get.offAllNamed(AppRoutes.homeNav);
 
       LocalStorage.token = data['data']["accessToken"];
-      LocalStorage.userId = data['data']["attributes"]["_id"];
-      LocalStorage.myImage = data['data']["attributes"]["image"];
-      LocalStorage.myName = data['data']["attributes"]["fullName"];
-
-      LocalStorage.myEmail = data['data']["attributes"]["email"];
       LocalStorage.isLogIn = true;
 
       LocalStorage.setBool(LocalStorageKeys.isLogIn, LocalStorage.isLogIn);
       LocalStorage.setString(LocalStorageKeys.token, LocalStorage.token);
-      LocalStorage.setString(LocalStorageKeys.userId, LocalStorage.userId);
-      LocalStorage.setString(LocalStorageKeys.myImage, LocalStorage.myImage);
-      LocalStorage.setString(LocalStorageKeys.myName, LocalStorage.myName);
-      LocalStorage.setString(LocalStorageKeys.myEmail, LocalStorage.myEmail);
-
-      // if (LocalStorage.myRole == 'consultant') {
-      //   Get.offAllNamed(AppRoutes.doctorHome);
-      // } else {
-      //   Get.offAllNamed(AppRoutes.patientsHome);
-      // }
 
       emailController.clear();
       passwordController.clear();

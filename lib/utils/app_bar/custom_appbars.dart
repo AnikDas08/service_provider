@@ -11,7 +11,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color titleColor;
   final Color iconColors;
   final double height;
-  final TextStyle? textStyle; // Optional: user can provide custom TextStyle
+  final TextStyle? textStyle;
+  final VoidCallback? onBackTap; // 👈 Added custom back button handler
 
   const CustomAppBar({
     super.key,
@@ -20,9 +21,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor = Colors.transparent,
     this.titleColor = Colors.black,
     this.height = 60,
-    this.textStyle, // Optional
+    this.textStyle,
     this.iconColors = Colors.black,
     this.showMessage = true,
+    this.onBackTap, // 👈 optional custom action
   });
 
   @override
@@ -34,45 +36,42 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         alignment: Alignment.center,
         children: [
           // Centered title
-          if(showMessage)
-          Center(
-            child: Text(
-              title!.tr,
-              style: textStyle ?? GoogleFonts.poppins(
-                textStyle: TextStyle(
-                  fontSize: 18,
-                  color: AppColors.primaryColor,
-                  fontWeight: FontWeight.w500,
-                ),
+          if (showMessage)
+            Center(
+              child: Text(
+                title?.tr ?? '',
+                style: textStyle ??
+                    GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 18,
+                        color: AppColors.primaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
               ),
             ),
-          ),
+
           // Back button
           if (showBackButton)
             Positioned(
               left: 0,
-              child: Padding(
-                padding: const EdgeInsets.only(),
-                child: GestureDetector(
-                  onTap: (){
-                    Get.back();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 2,
-                          offset: Offset(0, 2),
-                        ),
-                      ]
-                    ),
-                    child: Icon(Icons.arrow_back, color: iconColors,size: 24,),
-
+              child: GestureDetector(
+                onTap: onBackTap ?? () => Get.back(), // 👈 Default is Get.back()
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.all(5),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 2,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
+                  child: Icon(Icons.arrow_back, color: iconColors, size: 24),
                 ),
               ),
             ),

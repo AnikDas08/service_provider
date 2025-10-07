@@ -1,6 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/component/app_storage/app_auth_storage.dart';
+import 'package:haircutmen_user_app/component/app_storage/storage_key.dart';
+import 'package:haircutmen_user_app/features/profile/data/profile_model.dart';
 import 'package:haircutmen_user_app/services/storage/storage_services.dart';
 import 'package:haircutmen_user_app/utils/helpers/other_helper.dart';
 
@@ -29,7 +32,15 @@ class ProfileController extends GetxController {
   TextEditingController nameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
 
+  ProfileData? profileData;
+  bool isProfileLoading=false;
 
+
+  @override
+  void onInit() {
+    super.onInit();
+    getProfile();
+  }
 
 
   /// select image function here
@@ -43,6 +54,34 @@ class ProfileController extends GetxController {
     selectedLanguage = languages[index];
     update();
     Get.back();
+  }
+
+  Future<void> getProfile()async{
+    isProfileLoading=true;
+    update();
+    try{
+      final token=AppAuthStorage().getValue(StorageKey.token);
+      final response=await ApiService.get(
+        ApiEndPoint.user,
+        header: {
+          "Authorization": "Bearer ${LocalStorage.token}"
+        }
+      );
+      if(response.statusCode==200){
+        final profileModel=ProfileModel.fromJson(response.data);
+        profileData = profileModel.data;
+      }
+      else{
+        ///rtrfgg
+        Utils.errorSnackBar(response.statusCode, response.message);
+      }
+    }
+    catch(e){
+      Utils.errorSnackBar(0, e.toString());
+    }
+      isProfileLoading=false;
+      update();
+
   }
 
 

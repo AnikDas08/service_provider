@@ -25,7 +25,7 @@ class SignUpScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 20.w,),
               child: Column(
                 children: [
-                  CustomAppBar(title: "",),
+                  CustomAppBar(title: "",onBackTap: (){Get.offAllNamed(AppRoutes.onboarding);},),
                   /// Logo text here
                   const CommonText(
                     text: AppString.onboarding_text,

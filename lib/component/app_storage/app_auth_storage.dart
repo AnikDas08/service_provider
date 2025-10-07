@@ -6,11 +6,15 @@ Rx<GetStorage> box = GetStorage().obs;
 class AppAuthStorage {
   GetStorage box = GetStorage();
 
+
   Future<void> setToken(String value) async {
     await box.write(StorageKey.token, value);
   }
   Future<void> setRole(String value) async {
     await box.write(StorageKey.role, value);
+  }
+  Future<void> setLogin(String value) async {
+    await box.write(StorageKey.loginValue, value);
   }
 
   Future<void> setLanguageValue(String value) async {
@@ -23,6 +27,9 @@ class AppAuthStorage {
 
   ///////////////// All
   String? getValue(String value) {
+    return box.read(value);
+  }
+  String? getLoginhere(String value) {
     return box.read(value);
   }
 

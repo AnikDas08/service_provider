@@ -31,7 +31,7 @@ class SignInScreen extends StatelessWidget {
             child: SafeArea(
               child: Column(
                 children: [
-                  CustomAppBar(showMessage: false),
+                  CustomAppBar(showMessage: false,onBackTap: () => Get.offAllNamed(AppRoutes.onboarding)),
 
                   /// Logo text here
                   const CommonText(

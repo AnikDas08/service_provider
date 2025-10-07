@@ -36,8 +36,8 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 9,),
                   /// User Name here
-                  const CommonText(
-                    text: "Sohidul Islam",
+                  CommonText(
+                    text: controller.profileData?.name ?? 'Loading...',
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
                   ),
