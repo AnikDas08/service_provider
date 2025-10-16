@@ -17,11 +17,40 @@ class SignInController extends GetxController {
   TextEditingController emailController = TextEditingController(
     text: kDebugMode ? 'developernaimul00@gmail.com' : '',
   );
+
   TextEditingController passwordController = TextEditingController(
     text: kDebugMode ? 'asdfghjk9' : "",
   );
 
   /// Sign in Api call here
+
+
+  Future<bool> checkProfile() async {
+    try {
+      var response = await ApiService.get(
+        ApiEndPoint.myProvider,
+        header: {"Authorization": "Bearer ${LocalStorage.token}"},
+      );
+
+      if (response.statusCode == 200) {
+        return response.data['data']['aboutMe'] != null;
+      }
+      else if (response.statusCode == 401) {
+        // Session expired → logout
+        //AppAuthStorage().clear(); // if available
+        LocalStorage.isLogIn = false;
+        LocalStorage.token = "";
+        LocalStorage.setBool(LocalStorageKeys.isLogIn, false);
+        LocalStorage.setString(LocalStorageKeys.token, "");
+        return false;
+      }
+      else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 
   Future<void> signInUser() async {
     //Get.toNamed(AppRoutes.complete_profile_screen);
@@ -47,20 +76,34 @@ class SignInController extends GetxController {
       AppAuthStorage().setToken(data['data']["accessToken"]);
       AppAuthStorage().setLogin("djfkldfd");
 
-      Get.offAllNamed(AppRoutes.homeNav);
-
-      Get.offAllNamed(AppRoutes.homeNav);
-
       LocalStorage.token = data['data']["accessToken"];
       LocalStorage.isLogIn = true;
 
       LocalStorage.setBool(LocalStorageKeys.isLogIn, LocalStorage.isLogIn);
       LocalStorage.setString(LocalStorageKeys.token, LocalStorage.token);
 
+      if(await checkProfile()==false){
+        Get.offAllNamed(AppRoutes.complete_profile_screen);
+      }
+      else{
+        Get.offAllNamed(AppRoutes.homeNav);
+      }
+      //Get.offAllNamed(AppRoutes.complete_profile_screen);//Get.offAllNamed(AppRoutes.homeNav);
+
+
       emailController.clear();
       passwordController.clear();
 
-    } else {
+    }
+
+    else if (response.statusCode == 401) {
+      LocalStorage.isLogIn = false;
+      LocalStorage.token = "";
+      LocalStorage.setBool(LocalStorageKeys.isLogIn, false);
+      LocalStorage.setString(LocalStorageKeys.token, "");
+      Get.offAllNamed(AppRoutes.onboarding);
+    }
+    else {
       Get.snackbar(response.statusCode.toString(), response.message);
     }
 

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:haircutmen_user_app/features/auth/sign%20up/presentation/controller/complete_profile_controller.dart';
 import 'package:haircutmen_user_app/features/home/presentation/controller/service_details_controller.dart';
 import 'package:haircutmen_user_app/features/overview/presentation/controller/overview_controller.dart';
+import 'package:haircutmen_user_app/features/profile/presentation/controller/edit_profile_controller.dart';
 
 import '../../features/auth/change_password/presentation/controller/change_password_controller.dart';
 import '../../features/auth/forgot password/presentation/controller/forget_password_controller.dart';
@@ -33,6 +34,7 @@ class DependencyInjection extends Bindings {
     Get.lazyPut(() => PrivacyPolicyController(), fenix: true);
     Get.lazyPut(() => TermsOfServicesController(), fenix: true);
     Get.lazyPut(() => HomeController(), fenix: true);
+    Get.lazyPut(() => EditProfileController(), fenix: true);
     Get.lazyPut(() => HomeNavController(), fenix: true);
     Get.lazyPut(() => OverviewController(), fenix: true);
     Get.lazyPut(() => QRScannerController(), fenix: true);

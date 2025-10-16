@@ -18,14 +18,13 @@ class TermsOfServicesController extends GetxController {
 
   ///  Terms of services Api call here
   geTermsOfServicesRepo() async {
-    return;
     status = Status.loading;
     update();
 
-    var response = await ApiService.get(ApiEndPoint.termsOfServices);
+    var response = await ApiService.get(ApiEndPoint.termsCondition);
 
     if (response.statusCode == 200) {
-      data = HtmlModel.fromJson(response.data['data']['attributes']);
+      data = HtmlModel.fromJson(response.data['data']);
 
       status = Status.completed;
       update();

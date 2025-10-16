@@ -4,6 +4,8 @@ import '../../../../../config/route/app_routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../component/pop_up/common_pop_menu.dart';
+import '../../../../services/storage/storage_keys.dart';
+import '../../../../services/storage/storage_services.dart';
 import '../controller/setting_controller.dart';
 import '../../../../../utils/constants/app_colors.dart';
 import '../../../../../utils/constants/app_string.dart';
@@ -64,7 +66,13 @@ class SettingScreen extends StatelessWidget {
 
 
                   InkWell(
-                    onTap: () => logoutDialog(onConfirm: (){}),
+                    onTap: () => logoutDialog(onConfirm: (){
+                      LocalStorage.isLogIn = false;
+                      LocalStorage.token = "";
+                      LocalStorage.setBool(LocalStorageKeys.isLogIn, false);
+                      LocalStorage.setString(LocalStorageKeys.token, "");
+                      Get.offAllNamed(AppRoutes.onboarding);
+                    }),
                     child: const SettingItem(
                       title: AppString.logOut,
                       image: "assets/icons/logout_icon.svg",

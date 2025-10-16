@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:haircutmen_user_app/features/auth/forgot%20password/presentation/controller/forget_password_controller.dart';
 
 import '../../../../../component/text/common_text.dart';
 import '../../../../../config/route/app_routes.dart';

@@ -38,7 +38,7 @@ class LanguageController extends GetxController {
     // Get the saved language from storage
     String? savedLanguage = AppAuthStorage().getValue(StorageKey.language) ?? "en";
 
-    if (savedLanguage!.isNotEmpty) {
+    if (savedLanguage.isNotEmpty) {
       selectedLanguage.value = savedLanguage;
       print("Loaded saved language: $savedLanguage");
     } else {

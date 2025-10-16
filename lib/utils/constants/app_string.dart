@@ -114,6 +114,7 @@ class AppString {
   static const String hint_phone_number = "7674334";
   static const String location_text = "Location";
   static const String location_hint = "Choose City";
+  static const String save_button_text = "Save";
   static const String password_hint = "Enter Password";
   static const String already_have_account_chair = "Already Have an Account?";
 
@@ -216,6 +217,7 @@ class AppString {
   static const String start_time="Select Start Time";
   static const String end_time="Select End Time";
   static const String submit_button="Submit";
+  static const String submit_for_button="Submit for Approval";
 
   /// Message Screen
   static const String search_text="Search here";

@@ -53,18 +53,20 @@ class PersonalInformationScreen extends StatelessWidget {
                         ),
                       ]
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        InformationRow(title: AppString.full_name,value: controller.profileData?.name??"",),
-                        SizedBox(height: 12),
-                        InformationRow(title: AppString.email,value: controller.profileData?.email??"",),
-                        SizedBox(height: 12),
-                        InformationRow(title: AppString.contact,value: controller.profileData?.contact??"",),
-                        SizedBox(height: 12),
-                        InformationRow(title: AppString.location,value: controller.profileData?.location??"",),
-                        SizedBox(height: 12),
-                      ],
+                    child: Obx(
+                      ()=> Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InformationRow(title: AppString.full_name,value: controller.name.value.toString(),),
+                          SizedBox(height: 12),
+                          InformationRow(title: AppString.email,value: controller.email.value,),
+                          SizedBox(height: 12),
+                          InformationRow(title: AppString.contact,value: controller.phone.value,),
+                          SizedBox(height: 12),
+                          InformationRow(title: AppString.location,value: controller.location.value,),
+                          SizedBox(height: 12),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 20.h,),

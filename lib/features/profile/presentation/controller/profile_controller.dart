@@ -32,6 +32,11 @@ class ProfileController extends GetxController {
   TextEditingController nameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
 
+  var name = "".obs;
+  var phone = "".obs;
+  var email = "".obs;
+  var location = "".obs;
+
   ProfileData? profileData;
   bool isProfileLoading=false;
 
@@ -70,6 +75,13 @@ class ProfileController extends GetxController {
       if(response.statusCode==200){
         final profileModel=ProfileModel.fromJson(response.data);
         profileData = profileModel.data;
+        nameController.text=profileData?.name??"";
+        numberController.text=profileData?.contact??"";
+        name.value=profileData?.name??"";
+        phone.value=profileData?.contact??"";
+        email.value=profileData?.email??"";
+        location.value=profileData?.location??"";
+        update();
       }
       else{
         ///rtrfgg

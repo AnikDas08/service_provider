@@ -20,17 +20,6 @@ class OverviewScreen extends StatelessWidget {
           child: Scaffold(
             body: Column(
               children: [
-                // Calendar Header
-                /*Container(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  child: Obx(() => CommonText(
-                    text: controller.currentMonth,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.primaryColor,
-                  )),
-                ),*/
-
                 // TABLE CALENDAR IMPLEMENTATION
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 16.w),
@@ -52,7 +41,7 @@ class OverviewScreen extends StatelessWidget {
                     selectedDayPredicate: (day) {
                       return isSameDay(controller.selectedDay.value, day);
                     },
-                    calendarFormat: CalendarFormat.week, // Show only week view
+                    calendarFormat: CalendarFormat.week,
                     startingDayOfWeek: StartingDayOfWeek.sunday,
                     onDaySelected: controller.onDaySelected,
                     onPageChanged: (focusedDay) {
@@ -102,7 +91,6 @@ class OverviewScreen extends StatelessWidget {
                           onTap: () => controller.changeTab(0),
                           child: Container(
                             height: 38,
-                            //padding: EdgeInsets.symmetric(vertical: 5.h),
                             decoration: BoxDecoration(
                               color: controller.selectedTab.value == 0
                                   ? AppColors.primaryColor
@@ -162,7 +150,6 @@ class OverviewScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-
 
                 // Content based on selected tab
                 Expanded(
@@ -268,25 +255,27 @@ class OverviewScreen extends StatelessWidget {
                         ],
                       );
                     } else {
-                      // Working Time Tab Content
+                      // Working Time Tab Content - DYNAMIC ORDERING
+                      // Get ordered days based on selected date
+                      List<String> orderedDays = controller.getOrderedDays();
+
                       return SingleChildScrollView(
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          child: Obx(() => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Use controller's workingDays map instead of hardcoded values
-                              _buildWorkingDayCard(AppString.monday_text, controller),
-                              _buildWorkingDayCard(AppString.tuesday_text, controller),
-                              _buildWorkingDayCard(AppString.wednesday_text, controller),
-                              _buildWorkingDayCard(AppString.thursday_text, controller),
-                              _buildWorkingDayCard(AppString.friday_text, controller),
-                              _buildWorkingDayCard(AppString.saturday_text, controller),
-                              _buildWorkingDayCard(AppString.sunday_text, controller),
+                          child: Obx(() {
+                            // Force rebuild when selectedDay changes
+                            controller.selectedDay.value;
+                            List<String> orderedDays = controller.getOrderedDays();
 
-                              SizedBox(height: 20.h),
-                            ],
-                          )),
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Build working day cards in dynamic order
+                                ...orderedDays.map((day) => _buildWorkingDayCard(day, controller)),
+                                SizedBox(height: 20.h),
+                              ],
+                            );
+                          }),
                         ),
                       );
                     }
@@ -345,7 +334,7 @@ class OverviewScreen extends StatelessWidget {
                 height: 40,
                 child: Transform.scale(
                   scale:0.8,
-                  child: Switch(
+                  child: Obx(() => Switch(
                     value: controller.workingDays[day] ?? false,
                     onChanged: (val) {
                       controller.toggleDay(day, val);
@@ -361,7 +350,7 @@ class OverviewScreen extends StatelessWidget {
                         color: AppColors.primaryColor,
                       ),
                     ),
-                  ),
+                  )),
                 ),
               ),
             ],
@@ -407,6 +396,8 @@ class OverviewScreen extends StatelessWidget {
     );
   }
 
+  // Replace the _showTimeDialog method in your OverviewScreen with this:
+
   void _showTimeDialog(BuildContext context, OverviewController controller, String day) {
     showDialog(
       context: context,
@@ -421,67 +412,87 @@ class OverviewScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Start Time Dropdown
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop(); // Close current dialog
-                    controller.showStartTimePicker(day);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.grey[300]!),
+                Obx(() {
+                  String startTimeText = controller.getStartTime(day);
+                  bool isPlaceholder = startTimeText == "Start Time";
+
+                  return GestureDetector(
+                    onTap: () {
+                      //Navigator.of(context).pop();
+                      controller.showStartTimePicker(day);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            controller.workingTimes[day]!['start']!.isEmpty ? "Select Start Time" : startTimeText,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: isPlaceholder ? Colors.grey[500]! : Colors.black87,
+                            ),
+                          ),
+                          Icon(Icons.keyboard_arrow_down, color: Colors.grey[600], size: 20.sp),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Obx(() => CommonText(
-                          text: controller.getStartTime(day),
-                          fontSize: 14.sp,
-                          color: Colors.grey[600]!,
-                        )),
-                        Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
-                      ],
-                    ),
-                  ),
-                ),
+                  );
+                }),
 
                 SizedBox(height: 16.h),
 
                 // End Time Dropdown
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop(); // Close current dialog
-                    controller.showEndTimePicker(day);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.grey[300]!),
+                Obx(() {
+                  String endTimeText = controller.getEndTime(day);
+                  bool isPlaceholder = endTimeText == "End Time";
+
+                  return GestureDetector(
+                    onTap: () {
+                      //Navigator.of(context).pop();
+                      controller.showEndTimePicker(day);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            controller.workingTimes[day]!['end']!.isEmpty ? "Select End Time" : endTimeText,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: isPlaceholder ? Colors.grey[500]! : Colors.black87,
+                            ),
+                          ),
+                          Icon(Icons.keyboard_arrow_down, color: Colors.grey[600], size: 20.sp),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Obx(() => CommonText(
-                          text: controller.getEndTime(day),
-                          fontSize: 14.sp,
-                          color: Colors.grey[600]!,
-                        )),
-                        Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
-                      ],
-                    ),
-                  ),
-                ),
+                  );
+                }),
 
                 SizedBox(height: 24.h),
 
-                // Submit Button
-                SizedBox(
+                // Submit Button with API Call
+                Obx(() => SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : () async {
                       Navigator.of(context).pop();
+                      // Call the API to create schedule
+                      await controller.createSchedule(day);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
@@ -490,14 +501,23 @@ class OverviewScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
-                    child: CommonText(
-                      text: AppString.submit_button,
+                    child: controller.isLoading.value
+                        ? SizedBox(
+                      height: 20.h,
+                      width: 20.w,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                        : CommonText(
+                      text: AppString.save_button_text,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),
-                ),
+                )),
               ],
             ),
           ),
@@ -520,7 +540,7 @@ class OverviewScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 const months = [
                   AppString.january_text, AppString.february_text, AppString.march_text, AppString.april_text, AppString.may_text,
-                AppString.june_text, AppString.july_text, AppString.august_text, AppString.september_text,
+                  AppString.june_text, AppString.july_text, AppString.august_text, AppString.september_text,
                   AppString.october_text, AppString.november_text, AppString.december_text
                 ];
                 return ListTile(

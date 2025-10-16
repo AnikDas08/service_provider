@@ -4,19 +4,21 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/component/text/common_text.dart';
 import 'package:haircutmen_user_app/component/text_field/common_text_field.dart';
-import 'package:haircutmen_user_app/config/route/app_routes.dart';
-import 'package:haircutmen_user_app/features/home/widget/home_custom_button.dart';
-import 'package:haircutmen_user_app/features/profile/presentation/controller/edit_profile_controller.dart';
-import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
+import 'package:haircutmen_user_app/config/api/api_end_point.dart';
 
+import '../../../../utils/app_bar/custom_appbars.dart';
 import '../../../../utils/constants/app_colors.dart';
 import '../../../../utils/constants/app_string.dart';
+import '../../../home/widget/home_custom_button.dart';
+import '../controller/edit_profile_controller.dart';
 
 class EditProfile extends StatelessWidget {
-  const EditProfile({super.key});
+  EditProfile({super.key});
+  String? selectedLocation;
 
   @override
   Widget build(BuildContext context) {
+    final controller=Get.find<EditProfileController>();
     return GetBuilder<EditProfileController>(
       init: EditProfileController(),
       builder: (controller) {
@@ -29,24 +31,51 @@ class EditProfile extends StatelessWidget {
                   CustomAppBar(title: AppString.edit_profile_button,),
                   SizedBox(height: 20,),
                   Obx(
-                    ()=> Stack(
+                        () => Stack(
                       children: [
                         CircleAvatar(
                           radius: 60,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(60),
-                            child: controller.profileImage.value!=null?Image.file(
+                            child: controller.profileImage.value != null
+                                ? Image.file(
                               controller.profileImage.value!,
                               width: 120.w,
                               height: 120.h,
                               fit: BoxFit.cover,
-                            ):
-                                Image.asset(
+                            )
+                                : controller.profileData?.image != null
+                                ? Image.network(
+                              ApiEndPoint.imageUrl + controller.profileData!.image!,
+                              width: 120.w,
+                              height: 120.h,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
                                   "assets/images/item_image.png",
                                   width: 120.w,
                                   height: 120.h,
                                   fit: BoxFit.cover,
-                                )
+                                );
+                              },
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                            )
+                                : Image.asset(
+                              "assets/images/item_image.png",
+                              width: 120.w,
+                              height: 120.h,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         Positioned(
@@ -60,7 +89,7 @@ class EditProfile extends StatelessWidget {
                               border: Border.all(color: Colors.white, width: 2),
                             ),
                             child: GestureDetector(
-                              onTap: (){
+                              onTap: () {
                                 controller.handleImageUpload();
                               },
                               child: SvgPicture.asset(
@@ -104,16 +133,17 @@ class EditProfile extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 12,),
-                        EditPersonal(title: AppString.full_name, hintText: "Enter Your Full Name",),
+                        EditPersonal(title: AppString.full_name, controller: controller.nameController,),
                         SizedBox(height: 12,),
-                        EditPersonal(title: AppString.email, hintText: "Enter Email",),
+                        EditPersonal(title: AppString.contact_number_text, controller: controller.numberController,),
                         SizedBox(height: 12,),
-                        EditPersonal(title: AppString.phone, hintText: "Enter Number",),
-                        SizedBox(height: 12,),
-                        EditPersonal(title: AppString.location, hintText: "Enter Your Location",),
+                        /*EditPersonal(title: AppString.multiple_location, controller: controller.locationController,),
+                        SizedBox(height: 12,),*/
+                        EditPersonal(title: AppString.location_text, controller: controller.primaryLocationController,),
                         SizedBox(height: 20.h,),
-                        CustomButton(text: "Submit For Approval", isSelected: true, onTap: (){
-                          Get.offNamed(AppRoutes.homeNav);
+                        CustomButton(text: AppString.submit_for_button, isSelected: true, onTap: (){
+                          controller.editProfileRepo();
+                          controller.update();
                         })
                       ],
                     ),
@@ -126,15 +156,71 @@ class EditProfile extends StatelessWidget {
       },
     );
   }
+  Widget _buildLocationDropdown(EditProfileController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CommonText(
+          text: AppString.location_text,
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w400,
+          color: AppColors.black400,
+        ),
+        SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          height: 44,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.black100, width: 1),
+            borderRadius: BorderRadius.circular(4.r),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: Obx(() => DropdownButton<String>(
+              value: controller.selectedLocation.value.isEmpty
+                  ? null
+                  : controller.selectedLocation.value,
+              hint: CommonText(
+                text: 'Select Location',
+                fontSize: 12,
+                color: AppColors.black200,
+                textAlign: TextAlign.left,
+              ),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                color: AppColors.black300,
+                size: 24.sp,
+              ),
+              isExpanded: true,
+              items: controller.locations.map((String location) {
+                return DropdownMenuItem<String>(
+                  value: location,
+                  child: CommonText(
+                    text: location,
+                    fontSize: 14,
+                    color: AppColors.black400,
+                    textAlign: TextAlign.left,
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                controller.setSelectedLocation(newValue ?? '');
+              },
+            )),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class EditPersonal extends StatelessWidget {
   final String title;
-  final String hintText;
+  final TextEditingController controller;
   const EditPersonal({
     super.key,
     required this.title,
-    required this.hintText,
+    required this.controller
   });
 
   @override
@@ -151,9 +237,9 @@ class EditPersonal extends StatelessWidget {
         ),
         SizedBox(height: 6,),
         CommonTextField(
-          hintText: hintText,
+          controller: controller,
           hintTextColor: AppColors.black400,
-          height: 44,
+          //height: 44,
         )
       ],
     );

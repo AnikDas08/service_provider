@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:haircutmen_user_app/component/text/common_text.dart';
 import 'package:haircutmen_user_app/component/text_field/common_text_field.dart';
-import 'package:haircutmen_user_app/config/route/app_routes.dart';
 import 'package:haircutmen_user_app/features/home/widget/home_custom_button.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -148,41 +147,69 @@ class CompleteProfileScreen extends StatelessWidget {
 
               return Column(
                 children: [
-                  // Service dropdown
+                  // Category dropdown
                   _buildFieldWithLabel(
                     label: index == 0 ? "Service " : "Service ${index + 1}",
-                    child: _buildDropdownField(
+                    child: Obx(() => _buildDropdownFieldWithCallback(
                       controller: controller,
                       textController: pair.serviceController,
                       hintText: AppString.service_hint,
-                      items: controller.serviceNames,
-                    ),
+                      items: controller.categories
+                          .map((cat) => cat['name'] as String)
+                          .toList(),
+                      onSelected: (categoryName) {
+                        final category = controller.categories.firstWhere(
+                              (cat) => cat['name'] == categoryName,
+                        );
+                        controller.onCategorySelected(
+                          index,
+                          category['_id'] as String,
+                          categoryName,
+                        );
+                      },
+                    )),
                   ),
 
                   SizedBox(height: 16.h),
 
-                  // Service Type dropdown (depends on selected service)
+                  // SubCategory dropdown (depends on selected category)
                   _buildFieldWithLabel(
                     label: index == 0 ? "Service Type" : "Service Type ${index + 1}",
                     child: GetBuilder<CompleteProfileController>(
-                      builder: (controller) => _buildDropdownField(
-                        controller: controller,
-                        textController: pair.serviceTypeController,
-                        hintText: "Select Service Type",
-                        items: pair.serviceController.text.isNotEmpty
-                            ? controller.getServiceTypes(pair.serviceController.text)
-                            : [],
-                      ),
+                      builder: (controller) {
+                        final subCategories = pair.selectedCategoryId != null
+                            ? controller.getSubCategoriesForCategory(pair.selectedCategoryId!)
+                            : [];
+
+                        return _buildDropdownFieldWithCallback(
+                          controller: controller,
+                          textController: pair.serviceTypeController,
+                          hintText: "Select Service Type",
+                          items: subCategories
+                              .map((sub) => sub['subCategoryName'] as String)
+                              .toList(),
+                          onSelected: (subCategoryName) {
+                            final subCategory = subCategories.firstWhere(
+                                  (sub) => sub['subCategoryName'] == subCategoryName,
+                            );
+                            controller.onSubCategorySelected(
+                              index,
+                              subCategory['_id'] as String,
+                              subCategoryName,
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
 
                   SizedBox(height: 16.h),
 
-                  // Price field for each service (UPDATED)
+                  // Price field for each service
                   _buildFieldWithLabel(
                     label: index == 0 ? AppString.price_text : "${AppString.price_text} ${index + 1}",
                     child: CommonTextField(
-                      controller: pair.priceController, // Use the service pair's price controller
+                      controller: pair.priceController,
                       hintText: AppString.price_hints,
                       keyboardType: TextInputType.number,
                       height: 44,
@@ -527,6 +554,131 @@ class CompleteProfileScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDropdownFieldWithCallback({
+    required CompleteProfileController controller,
+    required TextEditingController textController,
+    required String hintText,
+    required List<String> items,
+    required Function(String) onSelected,
+  }) {
+    return GestureDetector(
+      onTap: () => _showDropdownBottomSheetWithCallback(
+        controller,
+        textController,
+        items,
+        onSelected,
+      ),
+      child: Container(
+        height: 44.h,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.black50),
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: CommonText(
+                  text: textController.text.isEmpty ? hintText : textController.text,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
+                  color: textController.text.isEmpty
+                      ? AppColors.textFiledColor
+                      : AppColors.black,
+                  textAlign: TextAlign.start,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: AppColors.textFiledColor,
+              size: 20.sp,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDropdownBottomSheetWithCallback(
+      CompleteProfileController controller,
+      TextEditingController textController,
+      List<String> items,
+      Function(String) onSelected,
+      ) {
+    showModalBottomSheet(
+      context: Get.context!,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: AppColors.black50,
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ),
+              SizedBox(height: 20.h),
+              CommonText(
+                text: "Select Option",
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.black,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16.h),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: items.map(
+                          (item) => GestureDetector(
+                        onTap: () {
+                          textController.text = item;
+                          onSelected(item);
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: AppColors.black50,
+                                width: 0.5,
+                              ),
+                            ),
+                          ),
+                          child: CommonText(
+                            text: item,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.black,
+                            textAlign: TextAlign.start,
+                          ),
+                        ),
+                      ),
+                    ).toList(),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildDistanceSlider(CompleteProfileController controller) {
     return Container(
       child: Column(
@@ -802,7 +954,7 @@ class CompleteProfileScreen extends StatelessWidget {
   }
 
   Widget _buildConfirmButton(CompleteProfileController controller) {
-    return Container(
+    return Obx(() => Container(
       width: double.infinity,
       height: 56.h,
       decoration: BoxDecoration(
@@ -813,12 +965,19 @@ class CompleteProfileScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(10.r),
-          onTap: (){
+          onTap: () async {
+            // 1️⃣ Check if profile image is selected and needs upload
+
+            // 2️⃣ Then confirm profile normally
             controller.confirmProfile();
-            Get.offAllNamed(AppRoutes.homeNav);
+
           },
           child: Center(
-            child: CommonText(
+            child: controller.isUploadingImage.value
+                ? CircularProgressIndicator(
+              color: Colors.white,
+            )
+                : CommonText(
               text: AppString.confirm_button,
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
@@ -828,8 +987,9 @@ class CompleteProfileScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
+
 
   void _showDropdownBottomSheet(
       CompleteProfileController controller,

@@ -18,11 +18,10 @@ class ServiceProviderController extends GetxController {
 
   /// Privacy Policy Api call here
   getPrivacyPolicyRepo() async {
-    return;
     status = Status.loading;
     update();
 
-    var response = await ApiService.get(ApiEndPoint.privacyPolicies);
+    var response = await ApiService.get(ApiEndPoint.serviceProviderPolicy);
 
     if (response.statusCode == 200) {
       data = HtmlModel.fromJson(response.data['data']['attributes']);

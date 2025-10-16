@@ -1,18 +1,18 @@
 class ProfileModel {
-  final bool success;
-  final String message;
+  final bool? success;
+  final String? message;
   final ProfileData? data;
 
   ProfileModel({
-    required this.success,
-    required this.message,
+    this.success,
+    this.message,
     this.data,
   });
 
   factory ProfileModel.fromJson(Map<dynamic, dynamic> json) {
     return ProfileModel(
-      success: json['success'] ?? false,
-      message: json['message'] ?? '',
+      success: json['success'],
+      message: json['message'],
       data: json['data'] != null ? ProfileData.fromJson(json['data']) : null,
     );
   }
@@ -23,6 +23,19 @@ class ProfileModel {
       'message': message,
       'data': data?.toJson(),
     };
+  }
+
+  /// 🔁 copyWith method (ProfileModel)
+  ProfileModel copyWith({
+    bool? success,
+    String? message,
+    ProfileData? data,
+  }) {
+    return ProfileModel(
+      success: success ?? this.success,
+      message: message ?? this.message,
+      data: data ?? this.data,
+    );
   }
 }
 
@@ -59,7 +72,7 @@ class ProfileData {
     this.v,
   });
 
-  factory ProfileData.fromJson(Map<String, dynamic> json) {
+  factory ProfileData.fromJson(Map<dynamic, dynamic> json) {
     return ProfileData(
       id: json['_id'],
       role: json['role'],
@@ -95,5 +108,40 @@ class ProfileData {
       'updatedAt': updatedAt,
       '__v': v,
     };
+  }
+
+  /// 🔁 copyWith method (ProfileData)
+  ProfileData copyWith({
+    String? id,
+    String? role,
+    String? name,
+    String? image,
+    String? email,
+    String? contact,
+    String? location,
+    int? credits,
+    bool? isActive,
+    bool? verified,
+    bool? isDeleted,
+    String? createdAt,
+    String? updatedAt,
+    int? v,
+  }) {
+    return ProfileData(
+      id: id ?? this.id,
+      role: role ?? this.role,
+      name: name ?? this.name,
+      image: image ?? this.image,
+      email: email ?? this.email,
+      contact: contact ?? this.contact,
+      location: location ?? this.location,
+      credits: credits ?? this.credits,
+      isActive: isActive ?? this.isActive,
+      verified: verified ?? this.verified,
+      isDeleted: isDeleted ?? this.isDeleted,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      v: v ?? this.v,
+    );
   }
 }

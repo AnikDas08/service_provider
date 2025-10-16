@@ -1,3 +1,4 @@
+/*
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class CompleteProfileController extends GetxController {
 
   // Observables
   var profileImage = Rxn<File>();
-  RxList<String> uploadedImages = <String>[].obs;
+  RxList uploadedImages = <String>[].obs;
   var serviceDistance = 0.0.obs;
   var isPrivacyAccepted = false.obs;
   var selectedLanguages = <String>[].obs;
@@ -41,7 +42,6 @@ class CompleteProfileController extends GetxController {
   var subCategoriesMap = <String, List<Map<String, dynamic>>>{}.obs;
   var isLoadingSubCategories = <String, bool>{}.obs;
   var isUploadingImage = false.obs;
-  var isSubmitting = false.obs;
 
   // Location
   double latitude = 0.0;
@@ -81,6 +81,7 @@ class CompleteProfileController extends GetxController {
 
   Future<void> fetchSubCategories(String categoryId) async {
     try {
+      // Set loading state
       isLoadingSubCategories[categoryId] = true;
       isLoadingSubCategories.refresh();
 
@@ -119,6 +120,7 @@ class CompleteProfileController extends GetxController {
       subCategoriesMap[categoryId] = [];
       subCategoriesMap.refresh();
     } finally {
+      // Remove loading state
       isLoadingSubCategories[categoryId] = false;
       isLoadingSubCategories.refresh();
     }
@@ -133,12 +135,20 @@ class CompleteProfileController extends GetxController {
       await ApiService.multipart(
         "user/profile",
         method: "PATCH",
-        imageName: "image",
+        imageName: "image", // change to backend expected field
         imagePath: profileImage.value!.path,
         header: {"Authorization": "Bearer ${LocalStorage.token}"},
       );
+
+      */
+/*if (response.statusCode == 200) {
+        //Get.snackbar("Success", "Profile image updated successfully!", backgroundColor: Colors.green[100]);
+      } else {
+        Get.snackbar("Error", response.data['message'] ?? "Failed to update profile image", backgroundColor: Colors.red[100]);
+      }*//*
+
     } catch (e) {
-      print("Error updating profile image: $e");
+      //Get.snackbar("Error", "Something went wrong: $e", backgroundColor: Colors.red[100]);
     } finally {
       isUploadingImage.value = false;
     }
@@ -193,6 +203,7 @@ class CompleteProfileController extends GetxController {
       longitude = position.longitude;
 
       print("Location fetched - Lat: $latitude, Long: $longitude");
+      // Don't update locationController here - let user type their own location
       update();
     } catch (e) {
       Get.snackbar(
@@ -225,6 +236,7 @@ class CompleteProfileController extends GetxController {
       servicePairs[pairIndex].selectedSubCategoryId = null;
       servicePairs[pairIndex].serviceTypeController.clear();
 
+      // Fetch subcategories for the selected category
       await fetchSubCategories(categoryId);
       update();
     }
@@ -256,43 +268,12 @@ class CompleteProfileController extends GetxController {
   }
 
   Future<void> handleWorkPhotosUpload() async {
-    try {
-      final picked = await ImagePicker().pickMultiImage();
-      if (picked != null && picked.isNotEmpty) {
-        // Check if adding these images would exceed the limit
-        int remainingSlots = 10 - uploadedImages.length;
-
-        if (picked.length > remainingSlots) {
-          Get.snackbar(
-            "Warning",
-            "You can only upload ${remainingSlots} more image(s). Only the first $remainingSlots images will be added.",
-            backgroundColor: Colors.orange[100],
-          );
-        }
-
-        // Add only the allowed number of images
-        int imagesToAdd = picked.length > remainingSlots ? remainingSlots : picked.length;
-        for (int i = 0; i < imagesToAdd; i++) {
-          uploadedImages.add(picked[i].path);
-        }
-
-        print("Total uploaded images: ${uploadedImages.length}");
-      }
-    } catch (e) {
-      print("Error picking images: $e");
-      Get.snackbar(
-        "Error",
-        "Failed to pick images: $e",
-        backgroundColor: Colors.red[100],
-      );
-    }
+    final picked = await ImagePicker().pickMultiImage();
+    if (picked != null) uploadedImages.addAll(picked.map((e) => e.path));
   }
 
   void removeWorkPhoto(int index) {
-    if (index < uploadedImages.length) {
-      uploadedImages.removeAt(index);
-      print("Image removed. Total images: ${uploadedImages.length}");
-    }
+    uploadedImages.removeAt(index);
   }
 
   // ----------------- Languages -----------------
@@ -348,32 +329,17 @@ class CompleteProfileController extends GetxController {
       Get.snackbar("Error", "Please fill all service details");
       return false;
     }
-    if (uploadedImages.isEmpty) {
-      Get.snackbar("Error", "Please upload at least one service image");
-      return false;
-    }
     return true;
   }
 
   // ----------------- Post Profile -----------------
   Future<void> confirmProfile() async {
     if (!validateForm()) return;
-
-    if (isSubmitting.value) {
-      print("Already submitting...");
-      return;
-    }
-
     await _postProviderProfile();
   }
 
   Future<void> _postProviderProfile() async {
     try {
-      isSubmitting.value = true;
-
-      print("=== Starting Profile Upload ===");
-      print("Total service images to upload: ${uploadedImages.length}");
-
       // Prepare data object
       Map<String, dynamic> dataObj = {
         "aboutMe": aboutMeController.text.trim(),
@@ -390,7 +356,8 @@ class CompleteProfileController extends GetxController {
       };
 
       // Prepare services array
-      List<Map<String, dynamic>> servicesArray = servicePairs.map((pair) {
+      List<Map<String, dynamic>> servicesArray =
+      servicePairs.map((pair) {
         return {
           "category": pair.selectedCategoryId ?? "",
           "subCategory": pair.selectedSubCategoryId ?? "",
@@ -398,57 +365,20 @@ class CompleteProfileController extends GetxController {
         };
       }).toList();
 
-      print("Data object: ${jsonEncode(dataObj)}");
-      print("Services array: ${jsonEncode(servicesArray)}");
+      List files = [
+        for (var image in uploadedImages)
+          {"name": "serviceImages", "image": image},
+      ];
 
-      // Create FormData
-      FormData formData = FormData();
-
-      // Add text fields
-      formData.fields.add(MapEntry("data", jsonEncode(dataObj)));
-      formData.fields.add(MapEntry("services", jsonEncode(servicesArray)));
-
-      // Add multiple service images
-      for (int i = 0; i < uploadedImages.length; i++) {
-        String imagePath = uploadedImages[i];
-        File imageFile = File(imagePath);
-
-        if (await imageFile.exists()) {
-          // Get MIME type
-          String? mimeType = lookupMimeType(imagePath);
-          String contentType = mimeType ?? 'image/jpeg';
-          List<String> mimeTypeParts = contentType.split('/');
-
-          print("Adding image ${i + 1}: $imagePath (MIME: $contentType)");
-
-          // Add image to FormData with the field name "serviceImages"
-          formData.files.add(
-            MapEntry(
-              "serviceImages",  // Field name must match backend expectation
-              await MultipartFile.fromFile(
-                imagePath,
-                filename: imageFile.path.split('/').last,
-                contentType: MediaType(mimeTypeParts[0], mimeTypeParts[1]),
-              ),
-            ),
-          );
-        } else {
-          print("Warning: Image file does not exist: $imagePath");
-        }
-      }
-
-      print("FormData fields: ${formData.fields.length}");
-      print("FormData files: ${formData.files.length}");
-
-      // Make API request using Dio
-      final response = await _makeMultipartRequest(
+      final response = await ApiService.multipartImage(
         ApiEndPoint.provider,
-        formData,
-        {"Authorization": "Bearer ${LocalStorage.token}"},
+        files: files,
+        body: {
+          "data": jsonEncode(dataObj),
+          'services': jsonEncode(servicesArray),
+        },
+        header: {"Authorization": "Bearer ${LocalStorage.token}"},
       );
-
-      print("Response status code: ${response.statusCode}");
-      print("Response data: ${response.data}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         Get.snackbar(
@@ -456,41 +386,24 @@ class CompleteProfileController extends GetxController {
           "Profile uploaded successfully!",
           backgroundColor: Colors.green[100],
         );
-
-        // Update profile image if selected
-        if (profileImage.value != null) {
-          await updateProfileImage();
-        }
-
-        // Navigate to home
+        await updateProfileImage();
         Get.offAllNamed(AppRoutes.homeNav);
       } else {
-        String errorMessage = "Failed to upload profile";
-
-        if (response.data != null) {
-          if (response.data is Map && response.data.containsKey('message')) {
-            errorMessage = response.data['message'];
-          } else if (response.data is String) {
-            //errorMessage = response.data;
-          }
-        }
-
         Get.snackbar(
           "Error",
-          errorMessage,
+          response.message,
           backgroundColor: Colors.red[100],
           duration: const Duration(seconds: 4),
+          maxWidth: 400,
         );
       }
     } catch (e) {
-      print("Error in _postProviderProfile: $e");
       Get.snackbar(
         "Error",
         "Failed to send profile: $e",
         backgroundColor: Colors.red[100],
       );
-    } finally {
-      isSubmitting.value = false;
+      print("Error details: $e");
     }
   }
 
@@ -503,86 +416,35 @@ class CompleteProfileController extends GetxController {
     try {
       Dio dio = Dio();
 
-      // Configure Dio
+      // Add interceptor for base URL and default settings
       dio.options.baseUrl = ApiEndPoint.baseUrl;
-      dio.options.connectTimeout = const Duration(seconds: 60);
-      dio.options.receiveTimeout = const Duration(seconds: 60);
-      dio.options.sendTimeout = const Duration(seconds: 60);
-
-      print("Making request to: ${dio.options.baseUrl}$url");
+      dio.options.connectTimeout = const Duration(seconds: 30);
+      dio.options.receiveTimeout = const Duration(seconds: 30);
+      dio.options.sendTimeout = const Duration(seconds: 30);
 
       final response = await dio.post(
         url,
         data: formData,
         options: Options(
-          headers: {
-            ...headers,
-            "Content-Type": "multipart/form-data",
-          },
-          validateStatus: (status) => status! < 500,
+          headers: {...headers, "Content-Type": "multipart/form-data"},
         ),
-        onSendProgress: (sent, total) {
-          double progress = (sent / total) * 100;
-          print("Upload progress: ${progress.toStringAsFixed(2)}%");
-        },
       );
 
-      print("Response received - Status: ${response.statusCode}");
-
-      return ApiResponseModel(
-        response.statusCode ?? 500,
-        response.data,
-      );
+      if (response.statusCode == 201) {
+        return ApiResponseModel(200, response.data);
+      }
+      return ApiResponseModel(response.statusCode, response.data);
     } on DioException catch (error) {
-      print("DioException occurred: ${error.type}");
-      print("Error message: ${error.message}");
-      print("Error response: ${error.response?.data}");
-
       if (error.type == DioExceptionType.badResponse) {
         return ApiResponseModel(
-          error.response?.statusCode ?? 500,
-          error.response?.data ?? {"message": "Bad response from server"},
-        );
-      } else if (error.type == DioExceptionType.connectionTimeout) {
-        return ApiResponseModel(
-          408,
-          {"message": "Connection timeout. Please check your internet connection."},
-        );
-      } else if (error.type == DioExceptionType.sendTimeout) {
-        return ApiResponseModel(
-          408,
-          {"message": "Upload timeout. Files may be too large."},
-        );
-      } else if (error.type == DioExceptionType.receiveTimeout) {
-        return ApiResponseModel(
-          408,
-          {"message": "Server response timeout. Please try again."},
+          error.response?.statusCode,
+          error.response?.data,
         );
       }
-
-      return ApiResponseModel(
-        500,
-        {"message": "Request failed: ${error.message}"},
-      );
+      return ApiResponseModel(500, {"message": "Request failed"});
     } catch (e) {
-      print("Unknown error occurred: $e");
-      return ApiResponseModel(
-        500,
-        {"message": "Unknown error occurred: $e"},
-      );
+      return ApiResponseModel(500, {"message": "Unknown error occurred"});
     }
-  }
-
-  @override
-  void onClose() {
-    aboutMeController.dispose();
-    locationController.dispose();
-    pricePerHourController.dispose();
-    for (var pair in servicePairs) {
-      pair.serviceController.dispose();
-      pair.serviceTypeController.dispose();
-      pair.priceController.dispose();
-    }
-    super.onClose();
   }
 }
+*/

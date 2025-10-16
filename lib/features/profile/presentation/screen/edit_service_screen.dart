@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:haircutmen_user_app/component/text/common_text.dart';
 import 'package:haircutmen_user_app/component/text_field/common_text_field.dart';
+import 'package:haircutmen_user_app/config/api/api_end_point.dart';
 import 'package:haircutmen_user_app/features/profile/presentation/controller/edit_service_controller.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,41 +31,49 @@ class EditServiceScreen extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 16.h),
+                  child: Obx(() {
+                    if (controller.isLoading.value) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primaryColor,
+                        ),
+                      );
+                    }
 
-                        // Profile Image Section
-                        _buildProfileImageSection(controller),
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 16.h),
 
-                        SizedBox(height: 24.h),
+                          // Profile Image Section
+                          _buildProfileImageSection(controller),
 
-                        // Form Fields
-                        _buildFormSection(controller),
+                          SizedBox(height: 24.h),
 
-                        SizedBox(height: 32.h),
+                          // Form Fields
+                          _buildFormSection(controller),
 
-                        // Upload Photos Section
-                        _buildUploadSection(controller),
+                          SizedBox(height: 32.h),
 
-                        SizedBox(height: 24.h),
+                          // Upload Photos Section
+                          _buildUploadSection(controller),
 
-                        // Combined Images Section (Asset + Uploaded)
-                        _buildCombinedImageSection(controller),
+                          SizedBox(height: 24.h),
 
-                        SizedBox(height: 24.h),
+                          // Combined Images Section (Asset + Uploaded)
+                          _buildCombinedImageSection(controller),
 
-                        SizedBox(height: 24.h),
+                          SizedBox(height: 24.h),
 
-                        // Confirm Button
-                        _buildConfirmButton(controller),
+                          // Confirm Button
+                          _buildConfirmButton(controller),
 
-                        SizedBox(height: 32.h),
-                      ],
-                    ),
-                  ),
+                          SizedBox(height: 32.h),
+                        ],
+                      ),
+                    );
+                  }),
                 ),
               ],
             ),
@@ -125,8 +134,11 @@ class EditServiceScreen extends StatelessWidget {
     return Obx(() {
       List<Widget> imageWidgets = [];
 
-      // Add asset images
+      // Add asset images (from API)
       for (int i = 0; i < controller.assetImages.length; i++) {
+        bool isUrl = controller.assetImages[i].startsWith('http') ||
+            controller.assetImages[i].startsWith('/');
+
         imageWidgets.add(
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
@@ -134,7 +146,33 @@ class EditServiceScreen extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
+                  child: isUrl
+                      ? Image.network(
+                    ApiEndPoint.imageUrl+controller.assetImages[i],
+                    width: 76,
+                    height: 76,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 76,
+                        height: 76,
+                        color: Colors.grey[300],
+                        child: Icon(Icons.error),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        width: 76,
+                        height: 76,
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    },
+                  )
+                      : Image.asset(
                     controller.assetImages[i],
                     width: 76,
                     height: 76,
@@ -166,7 +204,7 @@ class EditServiceScreen extends StatelessWidget {
         );
       }
 
-      // Add uploaded images
+      // Add uploaded images (newly added)
       for (int i = 0; i < controller.uploadedImages.length; i++) {
         imageWidgets.add(
           Padding(
@@ -274,7 +312,7 @@ class EditServiceScreen extends StatelessWidget {
                 children: [
                   // Service dropdown
                   _buildFieldWithLabel(
-                    label: index == 0 ? "Service " : "Service ${index + 1}",
+                    label: index == 0 ? "Service" : "Service ${index + 1}",
                     child: _buildDropdownField(
                       controller: controller,
                       textController: pair.serviceController,
@@ -299,12 +337,14 @@ class EditServiceScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16.h,),
 
+                  SizedBox(height: 16.h),
+
+                  // Price field
                   _buildFieldWithLabel(
                     label: index == 0 ? AppString.price_text : "${AppString.price_text} ${index + 1}",
                     child: CommonTextField(
-                      controller: pair.priceController, // Use the service pair's price controller
+                      controller: pair.priceController,
                       hintText: AppString.price_hints,
                       keyboardType: TextInputType.number,
                       height: 44,
@@ -313,7 +353,45 @@ class EditServiceScreen extends StatelessWidget {
                     ),
                   ),
 
-                  if (index < controller.servicePairs.length - 1) SizedBox(height: 16.h),
+                  // Delete button for services (except first one)
+                  /*if (controller.servicePairs.length > 1 && index > 0)
+                    Padding(
+                      padding: EdgeInsets.only(top: 8.h),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () => controller.removeService(index),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                            decoration: BoxDecoration(
+                              color: Colors.red[50],
+                              borderRadius: BorderRadius.circular(6.r),
+                              border: Border.all(color: Colors.red[200]!),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.delete_outline, size: 16.sp, color: Colors.red),
+                                SizedBox(width: 4.w),
+                                CommonText(
+                                  text: "Remove Service",
+                                  fontSize: 12.sp,
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                  textAlign: TextAlign.start,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),*/
+
+                  if (index < controller.servicePairs.length - 1)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: Divider(color: AppColors.black50, thickness: 1),
+                    ),
                 ],
               );
             }),
@@ -337,7 +415,7 @@ class EditServiceScreen extends StatelessWidget {
 
         SizedBox(height: 16.h),
 
-        // REPLACE THIS SECTION: Add Service Language - Multiple Selection
+        // Add Service Language - Multiple Selection
         _buildFieldWithLabel(
           label: AppString.add_service_language,
           child: Column(
@@ -453,9 +531,6 @@ class EditServiceScreen extends StatelessWidget {
 
         SizedBox(height: 16.h),
 
-
-        SizedBox(height: 16.h),
-
         // Price Per Hour
         _buildFieldWithLabel(
           label: AppString.price_hours,
@@ -472,7 +547,6 @@ class EditServiceScreen extends StatelessWidget {
     );
   }
 
-// Add this method at the end of your EditServiceScreen class
   void _showLanguageSelectionBottomSheet(EditServiceController controller) {
     showModalBottomSheet(
       context: Get.context!,
@@ -539,12 +613,15 @@ class EditServiceScreen extends StatelessWidget {
                                   textAlign: TextAlign.start,
                                 ),
                               ),
-                              if (controller.isLanguageSelected(language))
-                                Icon(
-                                  Icons.check_circle,
-                                  color: controller.isLanguageSelected(language)?AppColors.primaryColor:AppColors.black200,
-                                  size: 20.sp,
-                                ),
+                              Icon(
+                                controller.isLanguageSelected(language)
+                                    ? Icons.check_circle
+                                    : Icons.circle_outlined,
+                                color: controller.isLanguageSelected(language)
+                                    ? AppColors.primaryColor
+                                    : AppColors.black200,
+                                size: 20.sp,
+                              ),
                             ],
                           ),
                         ),
@@ -554,7 +631,6 @@ class EditServiceScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
-              // Done button
               Container(
                 width: double.infinity,
                 height: 48.h,
@@ -653,7 +729,6 @@ class EditServiceScreen extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(height: 8.h),
-
           Obx(() => SliderTheme(
             data: SliderTheme.of(Get.context!).copyWith(
               activeTrackColor: AppColors.primaryColor,
@@ -671,23 +746,19 @@ class EditServiceScreen extends StatelessWidget {
               onChanged: controller.updateServiceDistance,
             ),
           )),
-
-          // Min/Max Labels
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Obx(
-                        () {
-                      return CommonText(
-                        text: "${controller.serviceDistance.value.round()}km",
-                        fontSize: 12.sp,
-                        color: AppColors.black400,
-                        textAlign: TextAlign.start,
-                      );
-                    }
-                ),
+                Obx(() {
+                  return CommonText(
+                    text: "${controller.serviceDistance.value.round()}km",
+                    fontSize: 12.sp,
+                    color: AppColors.black400,
+                    textAlign: TextAlign.start,
+                  );
+                }),
                 CommonText(
                   text: "100km",
                   fontSize: 12.sp,
@@ -707,8 +778,7 @@ class EditServiceScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CommonText(
-          text: AppString.add_new
-          ,
+          text: AppString.add_new,
           fontSize: 14.sp,
           maxLines: 2,
           fontWeight: FontWeight.w400,
@@ -716,8 +786,6 @@ class EditServiceScreen extends StatelessWidget {
           textAlign: TextAlign.start,
         ),
         SizedBox(height: 12.h),
-
-        // Always show upload container
         Obx(() => GestureDetector(
           onTap: controller.getTotalImageCount() < 10
               ? controller.handleWorkPhotosUpload
@@ -786,9 +854,8 @@ class EditServiceScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(10.r),
-          onTap: (){
+          onTap: () {
             controller.confirmProfile();
-            //Get.toNamed(AppRoutes.verifyUser);
           },
           child: Center(
             child: CommonText(
@@ -838,30 +905,36 @@ class EditServiceScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 16.h),
-              ...items.map(
-                    (item) => GestureDetector(
-                  onTap: () {
-                    controller.selectFromDropdown(textController, item);
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: AppColors.black50,
-                          width: 0.5,
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: items.map(
+                          (item) => GestureDetector(
+                        onTap: () {
+                          controller.selectFromDropdown(textController, item);
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: AppColors.black50,
+                                width: 0.5,
+                              ),
+                            ),
+                          ),
+                          child: CommonText(
+                            text: item,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.black,
+                            textAlign: TextAlign.start,
+                          ),
                         ),
                       ),
-                    ),
-                    child: CommonText(
-                      text: item,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.black,
-                      textAlign: TextAlign.start,
-                    ),
+                    ).toList(),
                   ),
                 ),
               ),
