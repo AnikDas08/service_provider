@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/component/app_storage/app_auth_storage.dart';
@@ -10,9 +9,12 @@ import 'package:haircutmen_user_app/utils/helpers/other_helper.dart';
 import '../../../../config/api/api_end_point.dart';
 import '../../../../config/route/app_routes.dart';
 import '../../../../services/api/api_service.dart';
+import '../../../../services/storage/storage_keys.dart';
 import '../../../../utils/app_utils.dart';
 
 class ProfileController extends GetxController {
+  static ProfileController instance = Get.put(ProfileController());
+
   /// Language List here
   List languages = ["English", "French", "Arabic"];
 
@@ -36,17 +38,17 @@ class ProfileController extends GetxController {
   var phone = "".obs;
   var email = "".obs;
   var location = "".obs;
+  var images = "".obs;
+  var id = "".obs;
 
   ProfileData? profileData;
-  bool isProfileLoading=false;
-
+  bool isProfileLoading = false;
 
   @override
   void onInit() {
     super.onInit();
     getProfile();
   }
-
 
   /// select image function here
   getProfileImage() async {
@@ -61,42 +63,37 @@ class ProfileController extends GetxController {
     Get.back();
   }
 
-  Future<void> getProfile()async{
-    isProfileLoading=true;
+  Future<void> getProfile() async {
+    isProfileLoading = true;
     update();
-    try{
-      final token=AppAuthStorage().getValue(StorageKey.token);
-      final response=await ApiService.get(
+    try {
+      final token = AppAuthStorage().getValue(StorageKey.token);
+      final response = await ApiService.get(
         ApiEndPoint.user,
-        header: {
-          "Authorization": "Bearer ${LocalStorage.token}"
-        }
+        header: {"Authorization": "Bearer ${LocalStorage.token}"},
       );
-      if(response.statusCode==200){
-        final profileModel=ProfileModel.fromJson(response.data);
+      if (response.statusCode == 200) {
+        final profileModel = ProfileModel.fromJson(response.data);
         profileData = profileModel.data;
-        nameController.text=profileData?.name??"";
-        numberController.text=profileData?.contact??"";
-        name.value=profileData?.name??"";
-        phone.value=profileData?.contact??"";
-        email.value=profileData?.email??"";
-        location.value=profileData?.location??"";
+        nameController.text = profileData?.name ?? "";
+        numberController.text = profileData?.contact ?? "";
+        name.value = profileData?.name ?? "";
+        phone.value = profileData?.contact ?? "";
+        email.value = profileData?.email ?? "";
+        location.value = profileData?.location ?? "";
+        images.value = profileData?.image ?? "";
+
         update();
-      }
-      else{
+      } else {
         ///rtrfgg
         Utils.errorSnackBar(response.statusCode, response.message);
       }
-    }
-    catch(e){
+    } catch (e) {
       Utils.errorSnackBar(0, e.toString());
     }
-      isProfileLoading=false;
-      update();
-
+    isProfileLoading = false;
+    update();
   }
-
-
 
   /// update profile function here
   Future<void> editProfileRepo() async {

@@ -23,6 +23,7 @@ class ApiEndPoint {
   static const changePassword = "auth/change-password";
   static const user = "user/profile";
   static const notifications = "notifications";
-  static const chats = "chats";
+  static const chats = "chats/my-chats";
   static const messages = "messages";
+  static const sendMessage = "messages/create";
 }

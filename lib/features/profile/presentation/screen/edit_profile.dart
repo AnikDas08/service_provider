@@ -46,13 +46,13 @@ class EditProfile extends StatelessWidget {
                             )
                                 : controller.profileData?.image != null
                                 ? Image.network(
-                              ApiEndPoint.imageUrl + controller.profileData!.image!,
+                              ApiEndPoint.socketUrl + controller.profileData!.image!,
                               width: 120.w,
                               height: 120.h,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Image.asset(
-                                  "assets/images/item_image.png",
+                                  "assets/images/noImage.png",
                                   width: 120.w,
                                   height: 120.h,
                                   fit: BoxFit.cover,
@@ -71,7 +71,7 @@ class EditProfile extends StatelessWidget {
                               },
                             )
                                 : Image.asset(
-                              "assets/images/item_image.png",
+                              "assets/images/noImage.png",
                               width: 120.w,
                               height: 120.h,
                               fit: BoxFit.cover,

@@ -77,10 +77,13 @@ class SignInController extends GetxController {
       AppAuthStorage().setLogin("djfkldfd");
 
       LocalStorage.token = data['data']["accessToken"];
+      LocalStorage.userId = data['data']["id"];
       LocalStorage.isLogIn = true;
 
       LocalStorage.setBool(LocalStorageKeys.isLogIn, LocalStorage.isLogIn);
       LocalStorage.setString(LocalStorageKeys.token, LocalStorage.token);
+      LocalStorage.setString(LocalStorageKeys.userId, LocalStorage.userId);
+      print("klsdjfdkfj😍😍😍😍 ${LocalStorage.userId}");
 
       if(await checkProfile()==false){
         Get.offAllNamed(AppRoutes.complete_profile_screen);

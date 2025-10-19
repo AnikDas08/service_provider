@@ -7,7 +7,6 @@ import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:haircutmen_user_app/config/api/api_end_point.dart';
 import 'package:haircutmen_user_app/config/route/app_routes.dart';
-import 'package:haircutmen_user_app/features/auth/sign%20up/data/provider_models.dart';
 import 'package:haircutmen_user_app/services/storage/storage_services.dart';
 import '../../../../../services/api/api_response_model.dart';
 import '../../../../../services/api/api_service.dart';
@@ -258,14 +257,14 @@ class CompleteProfileController extends GetxController {
   Future<void> handleWorkPhotosUpload() async {
     try {
       final picked = await ImagePicker().pickMultiImage();
-      if (picked != null && picked.isNotEmpty) {
+      if (picked.isNotEmpty) {
         // Check if adding these images would exceed the limit
         int remainingSlots = 10 - uploadedImages.length;
 
         if (picked.length > remainingSlots) {
           Get.snackbar(
             "Warning",
-            "You can only upload ${remainingSlots} more image(s). Only the first $remainingSlots images will be added.",
+            "You can only upload $remainingSlots more image(s). Only the first $remainingSlots images will be added.",
             backgroundColor: Colors.orange[100],
           );
         }
@@ -467,14 +466,12 @@ class CompleteProfileController extends GetxController {
       } else {
         String errorMessage = "Failed to upload profile";
 
-        if (response.data != null) {
-          if (response.data is Map && response.data.containsKey('message')) {
-            errorMessage = response.data['message'];
-          } else if (response.data is String) {
-            //errorMessage = response.data;
-          }
+        if (response.data.containsKey('message')) {
+          errorMessage = response.data['message'];
+        } else if (response.data is String) {
+          //errorMessage = response.data;
         }
-
+      
         Get.snackbar(
           "Error",
           errorMessage,

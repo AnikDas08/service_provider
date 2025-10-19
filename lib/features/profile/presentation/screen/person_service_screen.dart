@@ -8,6 +8,7 @@ import 'package:haircutmen_user_app/features/home/widget/home_custom_button.dart
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:haircutmen_user_app/utils/constants/app_string.dart';
 import 'dart:io';
+import '../../../../component/app_storage/show_image_full.dart';
 import '../../../../component/text/common_text.dart';
 import '../../../../utils/constants/app_colors.dart';
 import '../controller/service_profile_controller.dart';
@@ -351,66 +352,84 @@ class ServiceProfileScreen extends StatelessWidget {
         // Check if it's a URL or local file path
         bool isUrl = controller.workPhotos[index].startsWith('http') ||
             controller.workPhotos[index].startsWith('/');
+        final imagePath = controller.workPhotos[index];
 
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: isUrl
-              ? Image.network(
-            ApiEndPoint.imageUrl+controller.workPhotos[index],
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.grey[300],
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.broken_image,
-                      size: 40,
-                      color: Colors.grey[600],
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Image not available',
-                      style: TextStyle(
-                        fontSize: 10,
+        return GestureDetector(
+          onTap: () {
+            // Open full-screen viewer
+            List<String> imageList = controller.workPhotos.map((photo) {
+              if (photo.startsWith('http/') || photo.startsWith('/')) {
+                return ApiEndPoint.imageUrl + photo;
+              } else {
+                return photo; // local file path
+              }
+            }).toList();
+
+            showDialog(
+              context: context,
+              builder: (_) => FullScreenImageViewer(images: imageList, initialIndex: index),
+            );
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: isUrl
+                ? Image.network(
+              ApiEndPoint.imageUrl+controller.workPhotos[index],
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[300],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.broken_image,
+                        size: 40,
                         color: Colors.grey[600],
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
-            },
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                color: Colors.grey[200],
-                child: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                        : null,
+                      SizedBox(height: 8),
+                      Text(
+                        'Image not available',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                ),
-              );
-            },
-          )
-              : Image.file(
-            File(controller.workPhotos[index]),
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.grey[300],
-                child: Icon(
-                  Icons.error,
-                  size: 40,
-                  color: Colors.grey[600],
-                ),
-              );
-            },
+                );
+              },
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  color: Colors.grey[200],
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  ),
+                );
+              },
+            )
+                : Image.file(
+              File(controller.workPhotos[index]),
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[300],
+                  child: Icon(
+                    Icons.error,
+                    size: 40,
+                    color: Colors.grey[600],
+                  ),
+                );
+              },
+            ),
           ),
         );
       },

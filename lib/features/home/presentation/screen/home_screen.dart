@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/component/text/common_text.dart';
+import 'package:haircutmen_user_app/config/api/api_end_point.dart';
 import 'package:haircutmen_user_app/config/route/app_routes.dart';
-import 'package:haircutmen_user_app/features/home/data/model/booking_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../utils/constants/app_colors.dart';
@@ -33,30 +33,37 @@ class HomeScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       // Profile Image
-                      CircleAvatar(
+                      Obx(
+                      ()=> CircleAvatar(
                         radius: 24.r,
-                        child: Image.asset("assets/images/profile_image.png"),
+                        backgroundImage: controller.image.value != ""
+                            ? NetworkImage(ApiEndPoint.socketUrl + controller.image.value)
+                            : const AssetImage("assets/images/profile_image.jpg") as ImageProvider,
+                        backgroundColor: Colors.transparent, // optional
+                      ),
                       ),
                       SizedBox(width: 12.w),
                       // Profile Info
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CommonText(
-                              text: 'Social Jasim',
-                              fontSize: 12.sp,
-                              color: Colors.grey[600]!,
-                            ),
-                            CommonText(
-                              text: AppString.welcome_text,
-                              fontSize: 16.sp,
-                              maxLines: 2,
-                              textAlign: TextAlign.start,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ],
+                        child: Obx(
+                              ()=> Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CommonText(
+                                text: controller.name.value,
+                                fontSize: 12.sp,
+                                color: Colors.grey[600]!,
+                              ),
+                              CommonText(
+                                text: AppString.welcome_text,
+                                fontSize: 16.sp,
+                                maxLines: 2,
+                                textAlign: TextAlign.start,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       // Online Status Toggle
@@ -170,7 +177,7 @@ class HomeScreen extends StatelessWidget {
                       Expanded(
                         child: CustomButton(
                           text: AppString.Cancel_button,
-                          fontSize:12,
+                          fontSize: 12,
                           height: 34,
                           isSelected: controller.selectedFilter == 2,
                           onTap: () => controller.changeFilter(2),
@@ -182,15 +189,45 @@ class HomeScreen extends StatelessWidget {
 
                 SizedBox(height: 16.h),
 
-                // Booking List
+                // Booking List with Loading State
                 Expanded(
-                  child: ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    itemCount: controller.getFilteredBookings().length,
-                    itemBuilder: (context, index) {
-                      final booking = controller.getFilteredBookings()[index];
-                      return _buildBookingCard(booking, controller);
-                    },
+                  child: controller.isLoading
+                      ? Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primaryColor,
+                    ),
+                  )
+                      : controller.getFilteredBookings().isEmpty
+                      ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.event_busy,
+                          size: 64.sp,
+                          color: Colors.grey[400],
+                        ),
+                        SizedBox(height: 16.h),
+                        CommonText(
+                          text: 'No bookings found',
+                          fontSize: 16.sp,
+                          color: Colors.grey[600]!,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ],
+                    ),
+                  )
+                      : RefreshIndicator(
+                    onRefresh: controller.fetchAllBookings,
+                    color: AppColors.primaryColor,
+                    child: ListView.builder(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      itemCount: controller.getFilteredBookings().length,
+                      itemBuilder: (context, index) {
+                        final booking = controller.getFilteredBookings()[index];
+                        return _buildBookingCard(booking, controller);
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -201,18 +238,20 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBookingCard(BookingModel booking, HomeController controller) {
+  Widget _buildBookingCard(Map<String, dynamic> booking, HomeController controller) {
     return GestureDetector(
-      onTap: (){
-        if(controller.selectedFilter==0){
-          Get.toNamed(AppRoutes.upcomingdetail_sscreen);
-        }
-        else if(controller.selectedFilter==1) {
-          Get.toNamed(AppRoutes.view_detail_pending);
-        }
-        else{
-
-        }
+      onTap: () {
+        if (controller.selectedFilter == 0) {
+          Get.toNamed(
+            AppRoutes.upcomingdetail_sscreen,
+            arguments: {'bookingId': controller.getFullBookingId(booking)},
+          );
+        } else if (controller.selectedFilter == 1) {
+          Get.toNamed(
+            AppRoutes.view_detail_pending,
+            arguments: {'bookingId': controller.getFullBookingId(booking)},
+          );
+        } else {}
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 12.h),
@@ -234,13 +273,25 @@ class HomeScreen extends StatelessWidget {
               width: 76.w,
               height: 87.h,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.zero, // no rounding
+                borderRadius: BorderRadius.zero,
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.zero, // ensure no clipping to circle
-                child: Image.asset(
+                borderRadius: BorderRadius.zero,
+                child: controller.getUserImage(booking).startsWith('http') ||
+                    controller.getUserImage(booking).startsWith('/')
+                    ? Image.network(
+                  ApiEndPoint.imageUrl + controller.getUserImage(booking),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      "assets/images/item_image.png",
+                      fit: BoxFit.cover,
+                    );
+                  },
+                )
+                    : Image.asset(
                   "assets/images/item_image.png",
-                  fit: BoxFit.cover, // fills the container
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -252,13 +303,14 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CommonText(
-                    text: booking.customerName,
+                    text: controller.getUserName(booking),
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
                     color: AppColors.black400,
                   ),
                   SizedBox(height: 4.h),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       SvgPicture.asset(
                         "assets/icons/propetion_icon.svg",
@@ -268,7 +320,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(width: 4.w),
                       CommonText(
-                        text: booking.service,
+                        text: controller.getServiceNames(booking),
                         fontSize: 14.sp,
                         color: AppColors.black400,
                         fontWeight: FontWeight.w400,
@@ -286,7 +338,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(width: 4.w),
                       CommonText(
-                        text: booking.date,
+                        text: controller.getFormattedDate(booking),
                         fontSize: 12.sp,
                         color: AppColors.black200,
                         fontWeight: FontWeight.w400,
@@ -300,11 +352,10 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(width: 4.w),
                       CommonText(
-                        text: booking.time,
+                        text: controller.getFormattedTime(booking),
                         fontSize: 12.sp,
                         color: AppColors.black200,
-                        fontWeight: FontWeight.w400
-                        ,
+                        fontWeight: FontWeight.w400,
                       ),
                     ],
                   ),
@@ -312,14 +363,14 @@ class HomeScreen extends StatelessWidget {
                   Row(
                     children: [
                       CommonText(
-                        text: 'Booking ID: ${booking.bookingId}',
+                        text: 'Booking ID: ${controller.getBookingId(booking)}',
                         fontSize: 12.sp,
                         color: AppColors.black300,
                         fontWeight: FontWeight.w400,
                       ),
                       SizedBox(width: 12.w),
                       CommonText(
-                        text: 'RSD: ${booking.price}',
+                        text: 'RSD: ${controller.getAmount(booking)}',
                         fontSize: 12.sp,
                         color: AppColors.black400,
                         fontWeight: FontWeight.w500,
@@ -336,7 +387,6 @@ class HomeScreen extends StatelessWidget {
               onTap: () => controller.viewBookingDetails(booking),
               isSmall: true,
               height: 24,
-              //fontSize: 14,
             ),
           ],
         ),
@@ -344,7 +394,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
 
 // Event class for table_calendar
 class Event {

@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:haircutmen_user_app/component/text/common_text.dart';
 import 'package:haircutmen_user_app/component/text_field/common_text_field.dart';
+import 'package:haircutmen_user_app/config/route/app_routes.dart';
 import 'package:haircutmen_user_app/features/home/widget/home_custom_button.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -935,6 +937,10 @@ class CompleteProfileScreen extends StatelessWidget {
                       color: AppColors.primaryColor,
                       decoration: TextDecoration.underline,
                     ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Get.toNamed(AppRoutes.privacyPolicy);// or Navigator.push(...)
+                      },
                   ),
                   TextSpan(text: " ${AppString.and_text} "),
                   TextSpan(
@@ -943,6 +949,10 @@ class CompleteProfileScreen extends StatelessWidget {
                       color: AppColors.primaryColor,
                       decoration: TextDecoration.underline,
                     ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Get.toNamed(AppRoutes.termsOfServices); // or Navigator.push(...)
+                      },
                   ),
                 ],
               ),

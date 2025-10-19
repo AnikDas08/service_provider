@@ -1,111 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:haircutmen_user_app/features/home/data/model/booking_model.dart';
-
 import '../../../../component/text/common_text.dart';
+import '../../../../config/api/api_end_point.dart';
+import '../../../../services/api/api_service.dart';
+import '../../../../services/storage/storage_services.dart';
+import '../../../../utils/app_utils.dart';
 import '../../../../utils/constants/app_colors.dart';
+import '../../../../config/route/app_routes.dart';
+import '../../../profile/data/profile_model.dart';
 
 class HomeController extends GetxController {
+  // Loading state
+  bool isLoading = false;
+
   // Online status
   bool isOnline = true;
 
   // Selected filter (0: Upcoming, 1: Pending, 2: Canceled)
   int selectedFilter = 0;
 
+  var name="".obs;
+  var image="".obs;
+  ProfileData? profileData;
 
   // Calendar state
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
 
-  // Sample booking data
-  List<BookingModel> allBookings = [
-    BookingModel(
-      customerName: 'Md Naimul Hasan',
-      service: 'Haircut',
-      date: '08.22.2025',
-      time: '10:00',
-      bookingId: '1256',
-      price: '2500',
-      profileImage: 'assets/images/customer1.jpg',
-      status: BookingStatus.upcoming,
-    ),
-    BookingModel(
-      customerName: 'MD SHAKIR AHMED',
-      service: 'Haircut',
-      date: '08.22.2025',
-      time: '11:00',
-      bookingId: '1268',
-      price: '2500',
-      profileImage: 'assets/images/item_image.png',
-      status: BookingStatus.upcoming,
-    ),
-    BookingModel(
-      customerName: 'Md Naimul Hasan',
-      service: 'Haircut',
-      date: '08.22.2025',
-      time: '10:00',
-      bookingId: '1256',
-      price: '2500',
-      profileImage: 'assets/images/item_image.png',
-      status: BookingStatus.upcoming,
-    ),
-    BookingModel(
-      customerName: 'Md Naimul Hasan',
-      service: 'Haircut',
-      date: '08.22.2025',
-      time: '10:00',
-      bookingId: '1256',
-      price: '2500',
-      profileImage: 'assets/images/item_image.png',
-      status: BookingStatus.upcoming,
-    ),
-    BookingModel(
-      customerName: 'Md Ananta Khan',
-      service: 'Haircut',
-      date: '08.22.2025',
-      time: '10:00',
-      bookingId: '1270',
-      price: '2500',
-      profileImage: 'assets/images/item_image.png',
-      status: BookingStatus.pending,
-    ),
-    BookingModel(
-      customerName: 'Md Ananta Khan',
-      service: 'Haircut',
-      date: '08.22.2025',
-      time: '10:00',
-      bookingId: '1270',
-      price: '2500',
-      profileImage: 'assets/images/item_image.png',
-      status: BookingStatus.pending,
-    ),
-    BookingModel(
-      customerName: 'Md Ananta Khan',
-      service: 'Haircut',
-      date: '08.22.2025',
-      time: '10:00',
-      bookingId: '1270',
-      price: '2500',
-      profileImage: 'assets/images/item_image.png',
-      status: BookingStatus.pending,
-    ),
-    BookingModel(
-      customerName: 'Md Delwar Hossain',
-      service: 'Haircut',
-      date: '08.22.2025',
-      time: '10:00',
-      bookingId: '1272',
-      price: '2500',
-      profileImage: 'assets/images/item_image.png',
-      status: BookingStatus.canceled,
-    ),
-  ];
+  // All bookings from API (raw data)
+  List<Map<String, dynamic>> allBookings = [];
 
   @override
   void onInit() {
     super.onInit();
     selectedDay = DateTime.now();
+    fetchAllBookings();
+    getProfile();
+  }
+
+  // Fetch all bookings
+  Future<void> fetchAllBookings() async {
+    isLoading = true;
+    update();
+
+    // Clear existing bookings before fetching new data
+    allBookings.clear();
+
+    try {
+      await Future.wait([
+        fetchBookingsByStatus('Pending'),
+        fetchBookingsByStatus('Upcoming'),
+        fetchBookingsByStatus('Cancelled'),
+      ]);
+    } catch (e) {
+      print('Error fetching bookings: $e');
+    } finally {
+      isLoading = false;
+      update();
+    }
+  }
+
+  // Fetch bookings by status
+  Future<void> fetchBookingsByStatus(String status) async {
+    try {
+      // Format selected date for API
+      String dateParam = '';
+      if (selectedDay != null) {
+        DateTime date = selectedDay!;
+        // Convert to UTC and format as ISO string
+        String formattedDate = DateTime.utc(date.year, date.month, date.day).toIso8601String();
+        dateParam = '&date=$formattedDate';
+      }
+
+      final response = await ApiService.get('booking?status=$status$dateParam');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> bookingsData = response.data['data'] ?? [];
+
+        for (var booking in bookingsData) {
+          if (booking is Map<String, dynamic>) {
+            allBookings.add(booking);
+          }
+        }
+
+        update();
+      }
+    } catch (e) {
+      print('Error fetching $status bookings: $e');
+    }
   }
 
   // Toggle online status
@@ -113,13 +96,10 @@ class HomeController extends GetxController {
     isOnline = !isOnline;
     update();
 
-    // You can add additional logic here like API calls
     if (isOnline) {
       print('User is now online');
-      // Call API to set status online
     } else {
       print('User is now offline');
-      // Call API to set status offline
     }
   }
 
@@ -130,17 +110,26 @@ class HomeController extends GetxController {
   }
 
   // Get filtered bookings based on selected filter
-  List<BookingModel> getFilteredBookings() {
+  List<Map<String, dynamic>> getFilteredBookings() {
+    String statusFilter;
     switch (selectedFilter) {
       case 0: // Upcoming
-        return allBookings.where((booking) => booking.status == BookingStatus.upcoming).toList();
+        statusFilter = 'Upcoming';
+        break;
       case 1: // Pending
-        return allBookings.where((booking) => booking.status == BookingStatus.pending).toList();
+        statusFilter = 'Pending';
+        break;
       case 2: // Canceled
-        return allBookings.where((booking) => booking.status == BookingStatus.canceled).toList();
+        statusFilter = 'Cancelled';
+        break;
       default:
         return allBookings;
     }
+
+    return allBookings.where((booking) {
+      String bookingStatus = booking['status']?.toString() ?? '';
+      return bookingStatus.toLowerCase() == statusFilter.toLowerCase();
+    }).toList();
   }
 
   // Calendar day selected
@@ -149,8 +138,10 @@ class HomeController extends GetxController {
     focusedDay = focusedDate;
     update();
 
-    // You can add logic to filter bookings by selected date
     print('Selected date: ${selectedDate.toIso8601String()}');
+
+    // Fetch bookings for the selected date
+    fetchAllBookings();
   }
 
   // Calendar page changed
@@ -159,14 +150,121 @@ class HomeController extends GetxController {
     update();
   }
 
+  // Get parsed user name
+  String getUserName(Map<String, dynamic> booking) {
+    if (booking['user'] != null && booking['user'] is Map) {
+      return booking['user']['name'] ?? 'Customer';
+    }
+    return 'Customer';
+  }
+
+  // Get parsed user image
+  String getUserImage(Map<String, dynamic> booking) {
+    if (booking['user'] != null && booking['user'] is Map) {
+      String? imageUrl = booking['user']['image'];
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        return imageUrl;
+      }
+    }
+    return 'assets/images/item_image.png';
+  }
+
+  // Get user location
+  String getUserLocation(Map<String, dynamic> booking) {
+    if (booking['user'] != null && booking['user'] is Map) {
+      return booking['user']['location'] ?? 'Location';
+    }
+    return 'Location';
+  }
+
+  // Get service categories (comma-separated)
+  String getServiceNames(Map<String, dynamic> booking) {
+    if (booking['services'] != null && booking['services'] is List) {
+      List<String> categoryNames = [];
+      for (var service in booking['services']) {
+        if (service is Map && service['category'] != null && service['category'] is Map) {
+          String? categoryName = service['category']['name'];
+          if (categoryName != null && categoryName.isNotEmpty) {
+            categoryNames.add(categoryName);
+          }
+        }
+      }
+      if (categoryNames.isNotEmpty) {
+        return categoryNames.join(', ');
+      }
+    }
+    return 'Service';
+  }
+
+  // Get formatted date
+  String getFormattedDate(Map<String, dynamic> booking) {
+    if (booking['date'] != null) {
+      try {
+        DateTime date = DateTime.parse(booking['date']);
+        return '${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}.${date.year}';
+      } catch (e) {
+        return '08.22.2025';
+      }
+    }
+    return '08.22.2025';
+  }
+
+  // Get formatted time (24-hour format)
+  String getFormattedTime(Map<String, dynamic> booking) {
+    if (booking['slots'] != null && booking['slots'].isNotEmpty) {
+      try {
+        DateTime startTime = DateTime.parse(booking['slots'][0]['start']);
+        int hour = startTime.hour;
+        int minute = startTime.minute;
+        return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+      } catch (e) {
+        return '10:00';
+      }
+    }
+    return '10:00';
+  }
+
+  // Get booking ID (last 4 digits)
+  String getBookingId(Map<String, dynamic> booking) {
+    if (booking['_id'] != null && booking['_id'].toString().length >= 4) {
+      return booking['_id'].toString().substring(booking['_id'].toString().length - 4);
+    }
+    return '0000';
+  }
+
+  // Get full booking ID
+  String getFullBookingId(Map<String, dynamic> booking) {
+    return booking['_id']?.toString() ?? '';
+  }
+
+  // Get amount
+  String getAmount(Map<String, dynamic> booking) {
+    return booking['amount']?.toString() ?? '0';
+  }
+
   // View booking details
-  void viewBookingDetails(BookingModel booking) {
-    print('Viewing booking details for: ${booking.customerName}');
+  void viewBookingDetails(Map<String, dynamic> booking) {
+    String userName = getUserName(booking);
+    print('Viewing booking details for: $userName');
 
-    // Navigate to booking details page
-    // Get.to(() => BookingDetailsScreen(booking: booking));
+    // If it's a pending booking, navigate to pending details screen
+    if (selectedFilter == 1) {
+      Get.toNamed(
+        AppRoutes.view_detail_pending,
+        arguments: {'bookingId': getFullBookingId(booking)},
+      );
+      return;
+    }
 
-    // Or show a dialog with booking details
+    // If it's an upcoming booking, navigate to upcoming details screen
+    if (selectedFilter == 0) {
+      Get.toNamed(
+        AppRoutes.upcomingdetail_sscreen,
+        arguments: {'bookingId': getFullBookingId(booking)},
+      );
+      return;
+    }
+
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
@@ -179,13 +277,13 @@ class HomeController extends GetxController {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow('Customer', booking.customerName),
-            _buildDetailRow('Service', booking.service),
-            _buildDetailRow('Date', booking.date),
-            _buildDetailRow('Time', booking.time),
-            _buildDetailRow('Booking ID', booking.bookingId),
-            _buildDetailRow('Price', 'BDT ${booking.price}'),
-            _buildDetailRow('Status', booking.status.name.capitalize!),
+            _buildDetailRow('Customer', getUserName(booking)),
+            _buildDetailRow('Service', getServiceNames(booking)),
+            _buildDetailRow('Date', getFormattedDate(booking)),
+            _buildDetailRow('Time', getFormattedTime(booking)),
+            _buildDetailRow('Booking ID', getBookingId(booking)),
+            _buildDetailRow('Price', 'BDT ${getAmount(booking)}'),
+            _buildDetailRow('Status', booking['status']?.toString() ?? 'N/A'),
           ],
         ),
         actions: [
@@ -228,80 +326,29 @@ class HomeController extends GetxController {
       ),
     );
   }
-
-  // Accept booking (for pending bookings)
-  void acceptBooking(BookingModel booking) {
-    print('Accepting booking: ${booking.bookingId}');
-    // Add API call logic here
-
-    // Update booking status locally
-    final index = allBookings.indexOf(booking);
-    if (index != -1) {
-      allBookings[index] = BookingModel(
-        customerName: booking.customerName,
-        service: booking.service,
-        date: booking.date,
-        time: booking.time,
-        bookingId: booking.bookingId,
-        price: booking.price,
-        profileImage: booking.profileImage,
-        status: BookingStatus.upcoming,
+  Future<void> getProfile()async{
+    try{
+      final response=await ApiService.get(
+          ApiEndPoint.user,
+          header: {
+            "Authorization": "Bearer ${LocalStorage.token}"
+          }
       );
-      update();
+      if(response.statusCode==200){
+        final profileModel=ProfileModel.fromJson(response.data);
+        profileData=profileModel.data;
+        name.value=profileData?.name??"";
+        image.value=profileData?.image??"";
+
+        update();
+      }
+      else{
+        ///rtrfgg
+        Utils.errorSnackBar(response.statusCode, response.message);
+      }
     }
-  }
-
-  // Reject booking (for pending bookings)
-  void rejectBooking(BookingModel booking) {
-    print('Rejecting booking: ${booking.bookingId}');
-    // Add API call logic here
-
-    // Update booking status locally
-    final index = allBookings.indexOf(booking);
-    if (index != -1) {
-      allBookings[index] = BookingModel(
-        customerName: booking.customerName,
-        service: booking.service,
-        date: booking.date,
-        time: booking.time,
-        bookingId: booking.bookingId,
-        price: booking.price,
-        profileImage: booking.profileImage,
-        status: BookingStatus.canceled,
-      );
-      update();
+    catch(e){
+      Utils.errorSnackBar(0, e.toString());
     }
-  }
-
-  // Cancel upcoming booking
-  void cancelBooking(BookingModel booking) {
-    print('Canceling booking: ${booking.bookingId}');
-    // Add API call logic here
-
-    // Update booking status locally
-    final index = allBookings.indexOf(booking);
-    if (index != -1) {
-      allBookings[index] = BookingModel(
-        customerName: booking.customerName,
-        service: booking.service,
-        date: booking.date,
-        time: booking.time,
-        bookingId: booking.bookingId,
-        price: booking.price,
-        profileImage: booking.profileImage,
-        status: BookingStatus.canceled,
-      );
-      update();
-    }
-  }
-
-  // Mark booking as completed
-  void completeBooking(BookingModel booking) {
-    print('Completing booking: ${booking.bookingId}');
-    // Add API call logic here
-
-    // You can add a completed status or remove from list
-    allBookings.removeWhere((b) => b.bookingId == booking.bookingId);
-    update();
   }
 }

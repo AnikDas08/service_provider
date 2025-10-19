@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haircutmen_user_app/features/profile/presentation/controller/profile_controller.dart';
 import 'package:haircutmen_user_app/utils/extensions/extension.dart';
 import '../../../config/route/app_routes.dart';
 import 'package:get/get.dart';
@@ -21,6 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final isLoggedIn = LocalStorage.isLogIn;
 
       if (isLoggedIn) {
+        ProfileController.instance.getProfile();
         bool isValidSession = await SignInController().checkProfile();
 
         if (isValidSession) {
