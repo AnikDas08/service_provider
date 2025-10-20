@@ -50,6 +50,7 @@ class QRScannerController extends GetxController {
     controller.scannedDataStream.listen((scanData) {
       if (isScanning.value && scanData.code != null) {
         onCodeScanned(scanData.code!);
+        print("kdjlkdsjfd 😍😍😍😍${scanData.code!}");
       }
     });
   }

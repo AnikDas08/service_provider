@@ -22,8 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final isLoggedIn = LocalStorage.isLogIn;
 
       if (isLoggedIn) {
-        ProfileController.instance.getProfile();
-        bool isValidSession = await SignInController().checkProfile();
+        bool isValidSession=await SignInController().checkProfile();
 
         if (isValidSession) {
           Get.offAllNamed(AppRoutes.homeNav);

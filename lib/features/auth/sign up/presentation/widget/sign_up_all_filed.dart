@@ -79,7 +79,7 @@ class SignUpAllField extends StatelessWidget {
               ),
         ),
 
-        const CommonText(text: AppString.referal_code_text, fontSize: 14, fontWeight: FontWeight.w400,color: AppColors.black400),
+        const CommonText(text: AppString.referal_code_text, fontSize: 14, fontWeight: FontWeight.w400,color: AppColors.black400,top: 12,bottom: 6,),
         SizedBox(height: 6,),
         CommonTextField(
           hintText: AppString.referal_code_hint,

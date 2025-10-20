@@ -44,9 +44,9 @@ class OverviewController extends GetxController {
   var scheduleList = <Map<String, dynamic>>[].obs;
 
   // Statistics
-  var successfulBooking = 50.obs;
-  var canceledBooking = 16.obs;
-  var totalMoneyEarned = 5000.obs;
+  var successfulBooking = 0.obs;
+  var canceledBooking = 0.obs;
+  var totalMoneyEarned = 0.obs;
 
   // Loading state
   var isLoading = false.obs;

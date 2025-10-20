@@ -73,8 +73,8 @@ class SignInController extends GetxController {
     if (response.statusCode == 200) {
       var data = response.data;
 
-      AppAuthStorage().setToken(data['data']["accessToken"]);
-      AppAuthStorage().setLogin("djfkldfd");
+      //AppAuthStorage().setToken(data['data']["accessToken"]);
+      //AppAuthStorage().setLogin("djfkldfd");
 
       LocalStorage.token = data['data']["accessToken"];
       LocalStorage.userId = data['data']["id"];

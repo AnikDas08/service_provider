@@ -11,7 +11,7 @@ import '../../../home/widget/home_custom_button.dart';
 import '../controller/scan_controller.dart';
 
 showQrDialog() async {
-  final QRScannerController controller = Get.find<QRScannerController>();
+  //final QRScannerController controller = Get.find<QRScannerController>();
   showDialog(
     context: Get.context!,
     barrierDismissible: false,
