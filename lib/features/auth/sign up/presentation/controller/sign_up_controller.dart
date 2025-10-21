@@ -18,6 +18,7 @@ class SignUpController extends GetxController {
   bool isPopUpOpen = false;
   bool isLoading = false;
   bool isLoadingVerify = false;
+  bool isLoadingWork=false;
 
   //Timer? _timer;
   //int start = 0;
@@ -107,6 +108,7 @@ class SignUpController extends GetxController {
     update();
   }
 
+
   /*void startTimer() {
     _timer?.cancel(); // Cancel any existing timer
     start = 180; // Reset the start value
@@ -170,6 +172,29 @@ class SignUpController extends GetxController {
     }
 
     isLoadingVerify = false;
+    update();
+  }
+
+  resetOpt() async {
+    //Get.toNamed(AppRoutes.verifyUser);
+    isLoadingWork = true;
+    update();
+    Map<String, String> body = {
+      "email":emailController.text,
+    };
+
+    var response = await ApiService.post(ApiEndPoint.reset_otp, body: body);
+
+    if (response.statusCode == 200) {
+      var data = response.data;
+      //signUpToken = data['data']['signUpToken'];
+      Get.toNamed(AppRoutes.verifyUser);
+      Utils.successSnackBar("Successfully", "OTP Send Successfully");
+    }
+    else {
+      Utils.errorSnackBar(response.statusCode.toString(), response.message);
+    }
+    isLoadingWork = false;
     update();
   }
 }

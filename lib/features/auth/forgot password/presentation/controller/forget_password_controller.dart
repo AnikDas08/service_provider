@@ -19,6 +19,7 @@ class ForgetPasswordController extends GetxController {
 
   /// Loading for Creating New Password
   bool isLoadingReset = false;
+  bool isLoadingWork = false;
 
   /// this is ForgetPassword Token , need to verification
   String forgetPasswordToken="";
@@ -160,6 +161,27 @@ class ForgetPasswordController extends GetxController {
     }
 
     isLoadingReset = false;
+    update();
+  }
+  Future<void> resetButton() async {
+    //Get.toNamed(AppRoutes.verifyEmail);
+    //return;
+    isLoadingWork = true;
+    update();
+
+    Map<String, String> body = {"email": emailController.text};
+    var response = await ApiService.post(
+      ApiEndPoint.reset_otp,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      Get.toNamed(AppRoutes.verifyEmail);
+      Get.snackbar("Succesful", "OTP Send Successfully");
+    } else {
+      Get.snackbar(response.statusCode.toString(), response.message);
+    }
+    isLoadingWork = false;
     update();
   }
 }

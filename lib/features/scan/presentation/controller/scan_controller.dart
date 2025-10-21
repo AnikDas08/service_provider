@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+import '../../../../config/api/api_end_point.dart';
+import '../../../../services/api/api_service.dart';
+import '../../../../services/storage/storage_services.dart';
 import '../widgets/qr_dialog_screen.dart';
 
 
@@ -44,16 +47,33 @@ class QRScannerController extends GetxController {
 
     // You can add API call or other logic here
   }
-
-  void onQRViewCreated(QRViewController controller) {
+  Future<void> onQRViewCreated(QRViewController controller) async {
     this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
+    controller.scannedDataStream.listen((scanData) async { // 👈 make it async
       if (isScanning.value && scanData.code != null) {
         onCodeScanned(scanData.code!);
         print("kdjlkdsjfd 😍😍😍😍${scanData.code!}");
+
+        try {
+          final response = await ApiService.patch(
+            ApiEndPoint.completeOrder + scanData.code!,
+            header: {
+              "Authorization": "Bearer ${LocalStorage.token}",
+            },
+          );
+          if (response.statusCode == 200) {
+            showSuccessDialog();
+          }
+          else{
+            Get.snackbar("Failed", "Order Complete Failed");
+          }
+        } catch (e) {
+          print(e);
+        }
       }
     });
   }
+
 
   void onCodeScanned(String code) {
     if (!isScanning.value) return;

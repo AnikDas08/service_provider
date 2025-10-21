@@ -50,6 +50,7 @@ class OverviewController extends GetxController {
 
   // Loading state
   var isLoading = false.obs;
+  var isOverviewLoading = false.obs;
 
   // Time options for dropdown
   final List<String> timeOptions = [
@@ -84,6 +85,9 @@ class OverviewController extends GetxController {
 
     // Fetch schedules on init
     fetchSchedules();
+
+    // Fetch booking overview on init
+    fetchBookingOverview();
   }
 
   // Tab change
@@ -91,25 +95,46 @@ class OverviewController extends GetxController {
     selectedTab.value = index;
   }
 
-  // Day selected in TableCalendar
+  // Day selected in TableCalendar - with toggle support
   void onDaySelected(DateTime selectedDate, DateTime focusedDate) {
-    selectedDay.value = selectedDate;
+    // Check if clicking the SAME day that's currently selected - toggle it off
+    if (selectedDay.value != null &&
+        selectedDay.value!.year == selectedDate.year &&
+        selectedDay.value!.month == selectedDate.month &&
+        selectedDay.value!.day == selectedDate.day) {
+      // Unselect the day
+      selectedDay.value = null;
+      print("📅 Day unselected - fetching monthly/yearly overview");
+    } else {
+      // Select the new day (or select a day if none was selected)
+      selectedDay.value = selectedDate;
+      print("📅 Day selected: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}");
+    }
+
     focusedDay.value = focusedDate;
+
+    // Force refresh to update UI
+    update();
 
     // Fetch schedules for the new selected week
     fetchSchedules();
 
-    // Force refresh of ordered days list
-    selectedDay.refresh();
+    // Fetch booking overview for the selected day (or month/year if day unselected)
+    fetchBookingOverview();
   }
 
-  // Change month from dropdown
+  // Change month from dropdown - with support for empty (all months)
   void changeMonth(String month) {
     selectedMonth.value = month;
 
-    // Update focusedDay to first day of selected month, keeping the year
-    int monthIndex = _monthIndex(month);
-    focusedDay.value = DateTime(focusedDay.value.year, monthIndex, 1);
+    // If month is selected (not empty), update focusedDay
+    if (month.isNotEmpty) {
+      int monthIndex = _monthIndex(month);
+      focusedDay.value = DateTime(focusedDay.value.year, monthIndex, 1);
+    }
+
+    // Fetch booking overview for the selected month (or yearly if empty)
+    fetchBookingOverview();
   }
 
   // Change year from dropdown
@@ -118,10 +143,91 @@ class OverviewController extends GetxController {
 
     // Update focusedDay to selected year, keeping the month
     focusedDay.value = DateTime(int.parse(year), focusedDay.value.month, 1);
+
+    // Fetch booking overview for the selected year
+    fetchBookingOverview();
   }
 
   // Top month name for display
   String get currentMonth => selectedMonth.value;
+
+  // Fetch Booking Overview API
+  Future<void> fetchBookingOverview() async {
+    try {
+      isOverviewLoading.value = true;
+
+      // Build query parameters based on selected date, month, and year
+      String queryParams = _buildOverviewQueryParams();
+
+      String url = "${ApiEndPoint.baseUrl}/booking/overview$queryParams";
+
+      print("📊 Fetching booking overview: $url");
+
+      final response = await ApiService.get(
+        url,
+        header: {
+          "Authorization": "Bearer ${LocalStorage.token}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        if (data['success'] == true && data['data'] != null) {
+          // Update statistics from API response
+          successfulBooking.value = data['data']['totalCompleted'] ?? 0;
+          canceledBooking.value = data['data']['totalCanceled'] ?? 0;
+          totalMoneyEarned.value = data['data']['totalEarned'] ?? 0;
+
+          print("✅ Booking Overview - Completed: ${successfulBooking.value}, Canceled: ${canceledBooking.value}, Earned: ${totalMoneyEarned.value}");
+        }
+      } else {
+        print("⚠️ Failed to fetch booking overview. Status: ${response.statusCode}");
+        _resetOverviewStats();
+      }
+
+    } catch (e) {
+      print("❌ Error fetching booking overview: $e");
+      _resetOverviewStats();
+    } finally {
+      isOverviewLoading.value = false;
+    }
+  }
+
+  // Build query parameters for overview API
+  String _buildOverviewQueryParams() {
+    List<String> params = [];
+
+    // Add day parameter ONLY if a specific day is selected
+    if (selectedDay.value != null) {
+      params.add("day=${selectedDay.value!.day}");
+      print("📅 Including day: ${selectedDay.value!.day}");
+    } else {
+      print("📅 No day selected - getting monthly/yearly data");
+    }
+
+    // Add month parameter ONLY if month is not empty
+    if (selectedMonth.value.isNotEmpty) {
+      int monthIndex = _monthIndex(selectedMonth.value);
+      params.add("month=$monthIndex");
+      print("📅 Including month: $monthIndex");
+    } else {
+      print("📅 No month selected - getting yearly data");
+    }
+
+    // Add year parameter from selected year
+    params.add("year=${selectedYear.value}");
+    print("📅 Including year: ${selectedYear.value}");
+
+    return params.isEmpty ? "" : "?${params.join('&')}";
+  }
+
+  // Reset overview statistics
+  void _resetOverviewStats() {
+    successfulBooking.value = 0;
+    canceledBooking.value = 0;
+    totalMoneyEarned.value = 0;
+  }
 
   // Get ordered list of days starting from selected date (ONLY NEXT 7 DAYS INCLUDING SELECTED)
   List<String> getOrderedDays() {
@@ -178,10 +284,6 @@ class OverviewController extends GetxController {
 
     return baseDate.add(Duration(days: daysToAdd));
   }
-
-  // Replace your existing toggleDay method with this:
-
-  // Replace your existing toggleDay method with this:
 
   void toggleDay(String day, bool value) async {
     // Check if there's a schedule for this day FIRST
@@ -261,8 +363,6 @@ class OverviewController extends GetxController {
     }
   }
 
-// Also UPDATE your _applySchedulesToWeek method to use isActive from API:
-
   void _applySchedulesToWeek() {
     DateTime baseDate = selectedDay.value ?? DateTime.now();
     DateTime startDate = DateTime(baseDate.year, baseDate.month, baseDate.day);
@@ -318,7 +418,6 @@ class OverviewController extends GetxController {
   String _formatDateForComparison(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
-
 
   // Get formatted working time for display
   String getWorkingTime(String day) {
@@ -509,10 +608,6 @@ class OverviewController extends GetxController {
     workingDays.refresh();
     workingTimes.refresh();
   }
-
-
-  // Helper: Format date for comparison (YYYY-MM-DD)
-
 
   // Helper: Get day name from weekday number
   String _getDayNameFromWeekday(int weekday) {

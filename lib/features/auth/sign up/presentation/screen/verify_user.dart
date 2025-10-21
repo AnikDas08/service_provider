@@ -164,6 +164,18 @@ class _VerifyUserState extends State<VerifyUser> {
                       ),
                     ),
                   ),
+                  20.height,
+                  CommonButton(
+                    titleText: AppString.resend_otp,
+                    isLoading: controller.isLoadingWork,
+                    buttonColor: AppColors.transparent,
+                    buttonWidth: MediaQuery.of(context).size.width * 0.6,
+                    borderColor: AppColors.primaryColor,
+                    titleColor: AppColors.primaryColor,
+                    onTap: () {
+                      controller.resetOpt();
+                    },
+                  )
                 ],
               ),
             ),

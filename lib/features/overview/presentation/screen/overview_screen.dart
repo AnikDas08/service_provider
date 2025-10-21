@@ -39,6 +39,10 @@ class OverviewScreen extends StatelessWidget {
                     lastDay: DateTime.utc(2030, 12, 31),
                     focusedDay: controller.focusedDay.value,
                     selectedDayPredicate: (day) {
+                      // Only show selected color if selectedDay is not null
+                      if (controller.selectedDay.value == null) {
+                        return false;
+                      }
                       return isSameDay(controller.selectedDay.value, day);
                     },
                     calendarFormat: CalendarFormat.week,
@@ -178,9 +182,16 @@ class OverviewScreen extends StatelessWidget {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Obx(() => CommonText(
-                                            text: controller.selectedMonth.value,
+                                            text: controller.selectedMonth.value.isEmpty
+                                                ? "All Months"
+                                                : controller.selectedMonth.value,
                                             fontSize: 14.sp,
-                                            color: Colors.grey[600]!,
+                                            color: controller.selectedMonth.value.isEmpty
+                                                ? Colors.grey[500]!
+                                                : Colors.grey[600]!,
+                                            fontWeight: controller.selectedMonth.value.isEmpty
+                                                ? FontWeight.w400
+                                                : FontWeight.w500,
                                           )),
                                           Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
                                         ],
@@ -256,9 +267,6 @@ class OverviewScreen extends StatelessWidget {
                       );
                     } else {
                       // Working Time Tab Content - DYNAMIC ORDERING
-                      // Get ordered days based on selected date
-                      List<String> orderedDays = controller.getOrderedDays();
-
                       return SingleChildScrollView(
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -396,8 +404,6 @@ class OverviewScreen extends StatelessWidget {
     );
   }
 
-  // Replace the _showTimeDialog method in your OverviewScreen with this:
-
   void _showTimeDialog(BuildContext context, OverviewController controller, String day) {
     showDialog(
       context: context,
@@ -418,7 +424,6 @@ class OverviewScreen extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
-                      //Navigator.of(context).pop();
                       controller.showStartTimePicker(day);
                     },
                     child: Container(
@@ -454,7 +459,6 @@ class OverviewScreen extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
-                      //Navigator.of(context).pop();
                       controller.showEndTimePicker(day);
                     },
                     child: Container(
@@ -534,23 +538,63 @@ class OverviewScreen extends StatelessWidget {
           title: CommonText(text: AppString.select_month, fontSize: 18.sp, fontWeight: FontWeight.w600),
           content: SizedBox(
             width: double.minPositive,
-            child: ListView.builder(
+            child: ListView(
               shrinkWrap: true,
-              itemCount: 12,
-              itemBuilder: (context, index) {
-                const months = [
-                  AppString.january_text, AppString.february_text, AppString.march_text, AppString.april_text, AppString.may_text,
-                  AppString.june_text, AppString.july_text, AppString.august_text, AppString.september_text,
-                  AppString.october_text, AppString.november_text, AppString.december_text
-                ];
-                return ListTile(
-                  title: CommonText(text: months[index], fontSize: 16.sp),
+              children: [
+                // Add "No Month" option at the top
+                ListTile(
+                  leading: Obx(() => Icon(
+                    controller.selectedMonth.value.isEmpty
+                        ? Icons.check_circle
+                        : Icons.circle_outlined,
+                    color: controller.selectedMonth.value.isEmpty
+                        ? AppColors.primaryColor
+                        : Colors.grey,
+                  )),
+                  title: CommonText(
+                    text: "All Months (Yearly Data)",
+                    fontSize: 16.sp,
+                    fontWeight: controller.selectedMonth.value.isEmpty
+                        ? FontWeight.w600
+                        : FontWeight.w400,
+                  ),
                   onTap: () {
-                    controller.changeMonth(months[index]);
+                    controller.changeMonth(''); // Empty string = no month selected
                     Navigator.of(context).pop();
                   },
-                );
-              },
+                ),
+                Divider(),
+                // Month options
+                ...List.generate(12, (index) {
+                  const months = [
+                    AppString.january_text, AppString.february_text, AppString.march_text,
+                    AppString.april_text, AppString.may_text, AppString.june_text,
+                    AppString.july_text, AppString.august_text, AppString.september_text,
+                    AppString.october_text, AppString.november_text, AppString.december_text
+                  ];
+                  return ListTile(
+                    leading: Obx(() => Icon(
+                      controller.selectedMonth.value == months[index]
+                          ? Icons.check_circle
+                          : Icons.circle_outlined,
+                      color: controller.selectedMonth.value == months[index]
+                          ? AppColors.primaryColor
+                          : Colors.grey,
+                    )),
+                    title: CommonText(
+                      text: months[index],
+                      fontSize: 16.sp,
+                      fontWeight: controller.selectedMonth.value == months[index]
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                    onTap: () {
+                      controller.changeMonth(months[index]);
+                      Navigator.of(context).pop();
+                    },
+                  );
+                }),
+              ],
             ),
           ),
         );

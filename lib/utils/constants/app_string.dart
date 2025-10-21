@@ -25,6 +25,7 @@ class AppString {
   static const String createYourNewPassword = "Create Your New Password";
   static const String password = "Password";
   static const String continues = "Continue";
+  static const String resend_otp = "Resend Otp";
   static const String email = "Email";
   static const String codeHasBeenSendTo = "Code has been send to";
   static const String otpIsInValid = "Otp is inValid";

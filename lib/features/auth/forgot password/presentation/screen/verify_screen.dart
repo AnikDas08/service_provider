@@ -159,11 +159,23 @@ class _VerifyScreenState extends State<VerifyScreen> {
                                 controller.verifyOtpRepo();
                               }
                             },
-                          ),
+                          )
                         ],
                       ),
                     ),
                   ),
+                  SizedBox(height: 20,),
+                  CommonButton(
+                    titleText: AppString.resend_otp,
+                    isLoading: controller.isLoadingWork,
+                    buttonColor: AppColors.transparent,
+                    borderColor: AppColors.primaryColor,
+                    titleColor: AppColors.primaryColor,
+                    buttonWidth: MediaQuery.of(context).size.width * 0.6,
+                    onTap: () {
+                      controller.resetButton();
+                    },
+                  )
                 ],
               ),
             ),
