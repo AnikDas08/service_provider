@@ -43,7 +43,7 @@ class PersonalInformationScreen extends StatelessWidget {
                         );
                       }
                       else{
-                        List<String> imageList=["assets/images/noImage.png"];
+                        List<String> imageList=["assets/images/profile_image.jpg"];
                         showDialog(
                             context: Get.context!,
                             builder: (_)=>FullScreenImageViewer(
@@ -58,7 +58,7 @@ class PersonalInformationScreen extends StatelessWidget {
                           radius: 60.sp,
                           backgroundColor: Colors.transparent,
                           backgroundImage: controller.images.value == ""
-                              ? const AssetImage("assets/images/noImage.png") as ImageProvider
+                              ? const AssetImage("assets/images/profile_image.jpg") as ImageProvider
                               : NetworkImage(ApiEndPoint.socketUrl + controller.images.value),
                         ),
                       ),

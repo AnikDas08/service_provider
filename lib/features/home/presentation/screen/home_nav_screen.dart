@@ -1,4 +1,3 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,11 +13,8 @@ import '../../../profile/presentation/screen/profile_screen.dart';
 
 class HomeNavScreen extends StatelessWidget {
   HomeNavScreen({super.key}) {
-    // Initialize the controller when the widget is created
     Get.put(HomeNavController());
   }
-
-  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey<CurvedNavigationBarState>();
 
   final List<Map<String, String>> _navItems = [
     {"icon": "assets/icons/home.svg", "label": "Home"},
@@ -31,77 +27,56 @@ class HomeNavScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeNavController>();
+
     return Obx(
-      ()=>Scaffold(
+          () => Scaffold(
         body: IndexedStack(
-                index: controller.selectedIndex.value,
-                children: [
-                  const HomeScreen(),
-                  const OverviewScreen(),
-                  // Lazy load only when QR tab selected
-                  controller.selectedIndex == 2
-                      ? QRScannerScreen()
-                      : Container(),
-                  ChatListScreen(),
-                  const ProfileScreen(),
-                ],
-              ),
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min,
+          index: controller.selectedIndex.value,
           children: [
-            // Curved Navigation Bar
-            CurvedNavigationBar(
-              key: _bottomNavigationKey,
-              index: controller.selectedIndex.value,
-              backgroundColor: AppColors.transparent,
-              buttonBackgroundColor: AppColors.primaryColor,
-              color: AppColors.primaryColor,
-              height: 50,
-              animationCurve: Curves.easeInOut,
-              animationDuration: const Duration(milliseconds: 600),
-              items: List.generate(_navItems.length, (index) {
-                return SvgPicture.asset(
-                  _navItems[index]["icon"]!,
-                  width: 24,
-                  height: 24,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
-                  ),
-                );
-              }),
-              onTap: controller.changeIndex,
-            ),
-            // Static text labels below
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 5.w),
-              width: double.infinity,
-              color: AppColors.primaryColor,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: List.generate(_navItems.length, (index) {
-                      return Expanded(
-                        child: Center(
-                          child: CommonText(
-                            text: _navItems[index]["label"]!,
-                            fontSize: 12,
-                            color: Colors.white,
-                            fontWeight: controller.selectedIndex == index
-                                ? FontWeight.w600
-                                : FontWeight.w400,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                  SizedBox(height: 40.h,),
-                ],
-              ),
-            ),
+            const HomeScreen(),
+            const OverviewScreen(),
+            controller.selectedIndex.value == 2 ? QRScannerScreen() : Container(),
+            ChatListScreen(),
+            const ProfileScreen(),
           ],
+        ),
+        bottomNavigationBar: Container(
+          color: AppColors.primaryColor,
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(_navItems.length, (index) {
+              final isSelected = controller.selectedIndex.value == index;
+              return GestureDetector(
+                onTap: () => controller.changeIndex(index),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 6.w),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        _navItems[index]["icon"]!,
+                        width: 26.w,
+                        height: 26.h,
+                        colorFilter: ColorFilter.mode(
+                          isSelected ? Colors.white : Colors.white54,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      SizedBox(height: 6.h),
+                      CommonText(
+                        text: _navItems[index]["label"]!,
+                        fontSize: 12.sp,
+                        color: isSelected ? Colors.white : Colors.white70,
+                        fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
       ),
     );

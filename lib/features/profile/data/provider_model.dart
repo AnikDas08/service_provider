@@ -129,7 +129,7 @@ class User {
   String? email;
   String? contact;
   String? location;
-  int? credits;
+  num? credits;
   bool? isActive;
   bool? verified;
   bool? verifiedService;
@@ -137,7 +137,6 @@ class User {
   bool? isDeleted;
   DateTime? createdAt;
   DateTime? updatedAt;
-
   User({
     this.id,
     this.role,

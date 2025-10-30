@@ -44,10 +44,9 @@ class EditServiceScreen extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Column(
                         children: [
-                          SizedBox(height: 16.h),
 
                           // Profile Image Section
-                          _buildProfileImageSection(controller),
+                          //_buildProfileImageSection(controller),
 
                           SizedBox(height: 24.h),
 

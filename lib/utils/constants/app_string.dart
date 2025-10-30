@@ -262,7 +262,7 @@ class AppString {
 
   /// QR Scan
   static const String qr_text = "QR Code";
-  static const String qr_details = "Please Scan QR Code Below";
+  static const String qr_details = "Please allow service provider to scan QR code below to complete the service.";
   static const String qr_name = "MD Kamran khan";
   static const String qr_id = "User ID : ";
   static const String privacy_policy_texts = "Lorem ipsum dolor sit amet consectetur. Eget imperdiet ultrices adipiscing et vitae adipiscing ornare. Vel tristique lorem viverra lorem sem consequat cras dui. Nisl libero nisl nec vulputate quam quis. Orci tempor pulvinar amet mi at et ac ipsum. Sed non massa accumsan dolor venenatis eleifend. Netus semper integer purus praesent nulla porttitor nibh. Lobortis ornare feugiat dictum eu cursus a platea fermentum. Tellus dolor a sit morbi. Elementum diam tortor est erat ultricies quam sed nibh. Eros pellentesque eu est lectus. Nunc facilisi ipsum senectus dolor adipiscing id pretium consectetur. Hendrerit aliquam lectus urna at commodo ultrices volutpat pulvinar donec. In ut sagittis placerat ut in. Sit erat accumsan eget libero fringilla metus. Est venenatis commodo ut velit non aenean in pulvinar. Pretium pretium aliquet at nec ut malesuada augue sed a. Turpis vestibulum dolor leo aliquam rhoncus fermentum. Elit congue diam euismod tempus nunc bibendum. Tempus sit dis sem non dignissim.";

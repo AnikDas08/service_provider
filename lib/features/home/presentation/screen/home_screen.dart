@@ -71,10 +71,10 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           CommonText(
                             text: AppString.online_voew,
-                            fontSize: 14.sp,
+                            fontSize: 12.sp,
                             color: controller.isOnline ? AppColors.primaryColor : Colors.grey[600]!,
                           ),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 4.w),
                           Switch(
                             value: controller.isOnline,
                             onChanged: (val) => controller.toggleOnlineStatus(),
@@ -85,6 +85,17 @@ class HomeScreen extends StatelessWidget {
                             trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
                           ),
                         ],
+                      ),
+                      SizedBox(width: 10,),
+                      GestureDetector(
+                        onTap: (){
+                          Get.toNamed(AppRoutes.notifications);
+                        },
+                        child: Icon(
+                            Icons.notifications_outlined,
+                            color: AppColors.black300,
+                            size: 24.sp
+                        ),
                       ),
                     ],
                   ),

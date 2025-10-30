@@ -26,6 +26,7 @@ class ApiEndPoint {
   static const reset_otp = "auth/resend-otp";
   static const notifications = "notifications";
   static const chats = "chats/my-chats";
+  static const review = "review/my-ratings";
   static const messages = "messages";
   static const sendMessage = "messages/create";
 }

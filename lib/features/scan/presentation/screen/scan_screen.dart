@@ -28,8 +28,9 @@ class QRScannerScreen extends StatelessWidget {
               CustomAppBar(title: "Scan",showBackButton: false,),
               SizedBox(height: 12.h),
               CommonText(
-                text: "Please Scan Your QR Code",
+                text: AppString.qr_details,
                 fontSize: 14.sp,
+                maxLines: 2,
                 fontWeight: FontWeight.w500,
                 color: AppColors.black400,
               ),
@@ -203,9 +204,11 @@ class QRScannerScreen extends StatelessWidget {
               CustomButton(
                   text: AppString.confirm_button,
                   isSelected: true,
-                  onTap: (){
-                    confirmDialog();
-                  }),
+                  onTap: () {
+                    // Call the confirmManualId method instead of confirmDialog
+                    controller.confirmManualId();
+                  }
+              ),
 
               const SizedBox(height: 30),
             ],

@@ -76,10 +76,12 @@ class ProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CommonText(
-                        text: "Hair Care",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
+                      Obx(
+                      ()=> CommonText(
+                          text: controller.category.value,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                       SizedBox(width: 6.w),
                       Icon(
@@ -88,14 +90,16 @@ class ProfileScreen extends StatelessWidget {
                         size: 24.sp,
                       ),
                       SizedBox(width: 4.w),
-                      CommonText(
-                        text: "4.6",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
+                      Obx(
+                        ()=> CommonText(
+                          text: controller.rating.value.toString(),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                       SizedBox(width: 4.w),
                       CommonText(
-                        text: "(300)",
+                        text: "(${controller.review.value})",
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: AppColors.black200,

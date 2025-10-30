@@ -55,7 +55,7 @@ showQrDialog() async {
                         isSelected: true,
                         onTap: (){
                           Get.back(); // Close the dialog first
-                          showReviewBottomSheet();
+                          //showReviewBottomSheet();
                         }
                     )
                 ),

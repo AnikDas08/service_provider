@@ -40,6 +40,9 @@ class ProfileController extends GetxController {
   var location = "".obs;
   var images = "".obs;
   var id = "".obs;
+  var rating = 0.0.obs;
+  var review = 0.obs;
+  var category= "".obs;
 
   ProfileData? profileData;
   bool isProfileLoading = false;
@@ -48,6 +51,7 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     getProfile();
+    getRating();
   }
 
   /// select image function here
@@ -69,19 +73,29 @@ class ProfileController extends GetxController {
     try {
       final token = AppAuthStorage().getValue(StorageKey.token);
       final response = await ApiService.get(
-        ApiEndPoint.user,
+        ApiEndPoint.getProvider,
         header: {"Authorization": "Bearer ${LocalStorage.token}"},
       );
       if (response.statusCode == 200) {
-        final profileModel = ProfileModel.fromJson(response.data);
-        profileData = profileModel.data;
-        nameController.text = profileData?.name ?? "";
+        /*final profileModel = ProfileModel.fromJson(response.data);
+        profileData = profileModel.data;*/
+        /*nameController.text = profileData?.name ?? "";
         numberController.text = profileData?.contact ?? "";
         name.value = profileData?.name ?? "";
         phone.value = profileData?.contact ?? "";
         email.value = profileData?.email ?? "";
         location.value = profileData?.location ?? "";
-        images.value = profileData?.image ?? "";
+        images.value = profileData?.image ?? "";*/
+
+
+        nameController.text = response.data["data"]["user"]["name"];
+        numberController.text = response.data["data"]["user"]["contact"];
+        name.value = response.data["data"]["user"]["name"];
+        phone.value = response.data["data"]["user"]["contact"];
+        email.value = response.data["data"]["user"]["email"];
+        location.value = response.data["data"]["user"]["location"];
+        images.value = response.data["data"]["user"]["image"];
+        category.value = response.data["data"]["services"][0]["category"]["name"];
 
         update();
       } else {
@@ -93,6 +107,25 @@ class ProfileController extends GetxController {
     }
     isProfileLoading = false;
     update();
+  }
+
+  Future<void> getRating()async{
+    try {
+      final token = AppAuthStorage().getValue(StorageKey.token);
+      final response = await ApiService.get(
+        ApiEndPoint.review,
+        header: {"Authorization": "Bearer ${LocalStorage.token}"},
+      );
+      if (response.statusCode == 200) {
+        rating.value = response.data["data"]["averageRating"];
+        review.value = response.data["data"]["totalReviews"];
+        update();
+      } else {
+        Get.snackbar("Error", response.message);
+      }
+    } catch (e) {
+
+    }
   }
 
   /// update profile function here

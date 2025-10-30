@@ -8,7 +8,6 @@ import '../../../../services/api/api_service.dart';
 import '../../../../services/storage/storage_services.dart';
 import '../widgets/qr_dialog_screen.dart';
 
-
 class QRScannerController extends GetxController {
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -17,75 +16,113 @@ class QRScannerController extends GetxController {
   var isScanning = true.obs;
   var scannedData = ''.obs;
   var selectedRating = 0.obs;
+  var isProcessing = false.obs; // Add loading state
+
   TextEditingController feedbackController = TextEditingController();
   TextEditingController barController = TextEditingController();
-
 
   @override
   void dispose() {
     controller?.dispose();
     feedbackController.dispose();
+    barController.dispose();
     super.dispose();
   }
 
-  // Add these methods to your QRScannerController class
   void setRating(int rating) {
     selectedRating.value = rating;
   }
 
   void submitFeedback() {
-    // Handle feedback submission logic here
     print('Rating: ${selectedRating.value}');
     print('Feedback: ${feedbackController.text}');
 
-    // Close the bottom sheet
     Get.back();
 
-    // Reset values
     selectedRating.value = 0;
     feedbackController.clear();
-
-    // You can add API call or other logic here
   }
+
   Future<void> onQRViewCreated(QRViewController controller) async {
     this.controller = controller;
-    controller.scannedDataStream.listen((scanData) async { // 👈 make it async
-      if (isScanning.value && scanData.code != null) {
-        onCodeScanned(scanData.code!);
-        print("kdjlkdsjfd 😍😍😍😍${scanData.code!}");
-
-        try {
-          final response = await ApiService.patch(
-            ApiEndPoint.completeOrder + scanData.code!,
-            header: {
-              "Authorization": "Bearer ${LocalStorage.token}",
-            },
-          );
-          if (response.statusCode == 200) {
-            showSuccessDialog();
-          }
-          else{
-            Get.snackbar("Failed", "Order Complete Failed");
-          }
-        } catch (e) {
-          print(e);
-        }
+    controller.scannedDataStream.listen((scanData) async {
+      if (isScanning.value && scanData.code != null && !isProcessing.value) {
+        await processScannedCode(scanData.code!);
       }
     });
   }
 
+  // Process scanned QR code or manual ID
+  Future<void> processScannedCode(String code) async {
+    if (isProcessing.value) return;
 
-  void onCodeScanned(String code) {
-    if (!isScanning.value) return;
-
+    isProcessing.value = true;
     isScanning.value = false;
     scannedData.value = code;
 
-    // Vibrate on successful scan
+    // Vibrate on scan
     HapticFeedback.lightImpact();
 
-    // Show success dialog
-    showSuccessDialog();
+    try {
+      final response = await ApiService.patch(
+        ApiEndPoint.completeOrder + code,
+        header: {
+          "Authorization": "Bearer ${LocalStorage.token}",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Only show dialog on success
+        showSuccessDialog();
+      } else {
+        Get.snackbar(
+          "Failed",
+          "Order Complete Failed",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        // Resume scanning after failure
+        resumeScanning();
+      }
+    } catch (e) {
+      print('Error: $e');
+      Get.snackbar(
+        "Error",
+        "Something went wrong. Please try again.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      // Resume scanning after error
+      resumeScanning();
+    } finally {
+      isProcessing.value = false;
+    }
+  }
+
+  // Handle manual ID confirmation from TextField
+  Future<void> confirmManualId() async {
+    String userId = barController.text.trim();
+
+    if (userId.isEmpty) {
+      Get.snackbar(
+        "Empty Field",
+        "Please enter a User ID",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    // Process the manual ID same as scanned code
+    await processScannedCode(userId);
+
+    // Clear the text field after processing
+    if (isProcessing.value == false) {
+      barController.clear();
+    }
   }
 
   void showSuccessDialog() {
@@ -101,6 +138,7 @@ class QRScannerController extends GetxController {
 
   void resumeScanning() {
     isScanning.value = true;
+    isProcessing.value = false;
     controller?.resumeCamera();
   }
 
@@ -110,9 +148,6 @@ class QRScannerController extends GetxController {
   }
 
   void scanFromGallery() {
-    // Implementation for scanning from gallery
-    // You can use image_picker and qr_code_tools packages
     print('Scan from gallery functionality');
   }
 }
-
