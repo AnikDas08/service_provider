@@ -19,6 +19,9 @@ class SignUpController extends GetxController {
   bool isLoading = false;
   bool isLoadingVerify = false;
   bool isLoadingWork=false;
+  String completePhoneNumber = ''; // Stores phone with country code
+  String countryCode = '+880'; // Stores selected country code
+  String countryFlag = '🇧🇩';
 
   //Timer? _timer;
   //int start = 0;
@@ -27,7 +30,6 @@ class SignUpController extends GetxController {
 
   List selectedOption = ["User", "Consultant"];
 
-  String countryCode = "+880";
   String? image;
 
   String signUpToken = '';

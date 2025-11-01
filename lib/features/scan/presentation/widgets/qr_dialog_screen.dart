@@ -51,7 +51,7 @@ showQrDialog() async {
                 SizedBox(width: 10,),
                 Expanded(
                     child: CustomButton(
-                        text: "Review",
+                        text: "Done",
                         isSelected: true,
                         onTap: (){
                           Get.back(); // Close the dialog first

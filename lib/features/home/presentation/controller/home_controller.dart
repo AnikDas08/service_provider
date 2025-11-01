@@ -13,6 +13,7 @@ import '../../../profile/data/profile_model.dart';
 class HomeController extends GetxController {
   // Loading state
   bool isLoading = false;
+  bool isLoadingMore = false;
 
   // Online status
   bool isOnline = true;
@@ -20,8 +21,8 @@ class HomeController extends GetxController {
   // Selected filter (0: Upcoming, 1: Pending, 2: Canceled)
   int selectedFilter = 0;
 
-  var name="".obs;
-  var image="".obs;
+  var name = "".obs;
+  var image = "".obs;
   ProfileData? profileData;
 
   // Calendar state
@@ -31,27 +32,72 @@ class HomeController extends GetxController {
   // All bookings from API (raw data)
   List<Map<String, dynamic>> allBookings = [];
 
+  // Pagination data
+  Map<String, int> currentPage = {
+    'Pending': 1,
+    'Upcoming': 1,
+    'Canceled': 1,
+  };
+
+  Map<String, int> totalPages = {
+    'Pending': 1,
+    'Upcoming': 1,
+    'Canceled': 1,
+  };
+
+  Map<String, int> totalItems = {
+    'Pending': 0,
+    'Upcoming': 0,
+    'Canceled': 0,
+  };
+
+  // ScrollController for pagination
+  ScrollController scrollController = ScrollController();
+
   @override
   void onInit() {
     super.onInit();
     selectedDay = DateTime.now();
+    setupScrollListener();
     fetchAllBookings();
     getProfile();
+    getOnlineStatus();
   }
 
-  // Fetch all bookings
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
+  }
+
+  // Setup scroll listener for infinite scroll
+  void setupScrollListener() {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+        // User is near the bottom, load more data
+        loadMoreBookings();
+      }
+    });
+  }
+
+  // Fetch all bookings (initial load)
   Future<void> fetchAllBookings() async {
     isLoading = true;
     update();
 
-    // Clear existing bookings before fetching new data
+    // Clear existing bookings and reset pagination
     allBookings.clear();
+    currentPage = {
+      'Pending': 1,
+      'Upcoming': 1,
+      'Canceled': 1,
+    };
 
     try {
       await Future.wait([
-        fetchBookingsByStatus('Pending'),
-        fetchBookingsByStatus('Upcoming'),
-        fetchBookingsByStatus('Cancelled'),
+        fetchBookingsByStatus('Pending', page: 1),
+        fetchBookingsByStatus('Upcoming', page: 1),
+        fetchBookingsByStatus('Canceled', page: 1),
       ]);
     } catch (e) {
       print('Error fetching bookings: $e');
@@ -61,8 +107,35 @@ class HomeController extends GetxController {
     }
   }
 
-  // Fetch bookings by status
-  Future<void> fetchBookingsByStatus(String status) async {
+  // Load more bookings for current filter
+  Future<void> loadMoreBookings() async {
+    if (isLoadingMore) return;
+
+    String statusFilter = _getStatusFromFilter(selectedFilter);
+
+    // Check if there are more pages to load
+    if (currentPage[statusFilter]! >= totalPages[statusFilter]!) {
+      print('No more pages to load for $statusFilter');
+      return;
+    }
+
+    isLoadingMore = true;
+    update();
+
+    try {
+      int nextPage = currentPage[statusFilter]! + 1;
+      await fetchBookingsByStatus(statusFilter, page: nextPage);
+      currentPage[statusFilter] = nextPage;
+    } catch (e) {
+      print('Error loading more bookings: $e');
+    } finally {
+      isLoadingMore = false;
+      update();
+    }
+  }
+
+  // Fetch bookings by status with pagination
+  Future<void> fetchBookingsByStatus(String status, {int page = 1}) async {
     try {
       // Format selected date for API
       String dateParam = '';
@@ -73,14 +146,25 @@ class HomeController extends GetxController {
         dateParam = '&date=$formattedDate';
       }
 
-      final response = await ApiService.get('booking?status=$status$dateParam');
+      final response = await ApiService.get('booking?status=$status&page=$page$dateParam');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data != null) {
         final List<dynamic> bookingsData = response.data['data'] ?? [];
+
+        // Update pagination info
+        if (response.data['pagination'] != null) {
+          final pagination = response.data['pagination'];
+          totalPages[status] = pagination['totalPages'] ?? 1;
+          totalItems[status] = pagination['total'] ?? 0;
+          print('$status - Page: ${pagination['page']}, Total Pages: ${pagination['totalPages']}, Total Items: ${pagination['total']}');
+        }
 
         for (var booking in bookingsData) {
           if (booking is Map<String, dynamic>) {
-            allBookings.add(booking);
+            // Avoid duplicates
+            if (!allBookings.any((b) => b['_id'] == booking['_id'])) {
+              allBookings.add(booking);
+            }
           }
         }
 
@@ -89,6 +173,12 @@ class HomeController extends GetxController {
     } catch (e) {
       print('Error fetching $status bookings: $e');
     }
+  }
+
+
+  // Refresh bookings (pull to refresh)
+  Future<void> refreshBookings() async {
+    await fetchAllBookings();
   }
 
   // Toggle online status
@@ -102,34 +192,66 @@ class HomeController extends GetxController {
       print('User is now offline');
     }
   }
+  Future<void> onlineStatus()async{
+    final response=await ApiService.patch(
+      'provider/online-offline-provider',
+      header: {
+        "Authorization": "Bearer ${LocalStorage.token}"
+      }
+    );
+    if(response.statusCode==200){
+      isOnline=response.data['data']['isOnline'];
+      update();
+    }
+  }
 
   // Change filter tab
   void changeFilter(int index) {
     selectedFilter = index;
     update();
+
+    // Reset scroll position
+    if (scrollController.hasClients) {
+      scrollController.jumpTo(0);
+    }
+  }
+
+  // Get status string from filter index
+  String _getStatusFromFilter(int filterIndex) {
+    switch (filterIndex) {
+      case 0: // Upcoming
+        return 'Upcoming';
+      case 1: // Pending
+        return 'Pending';
+      case 2: // Canceled
+        return 'Canceled';
+      default:
+        return 'Upcoming';
+    }
   }
 
   // Get filtered bookings based on selected filter
   List<Map<String, dynamic>> getFilteredBookings() {
-    String statusFilter;
-    switch (selectedFilter) {
-      case 0: // Upcoming
-        statusFilter = 'Upcoming';
-        break;
-      case 1: // Pending
-        statusFilter = 'Pending';
-        break;
-      case 2: // Canceled
-        statusFilter = 'Cancelled';
-        break;
-      default:
-        return allBookings;
-    }
+    String statusFilter = _getStatusFromFilter(selectedFilter);
 
     return allBookings.where((booking) {
       String bookingStatus = booking['status']?.toString() ?? '';
       return bookingStatus.toLowerCase() == statusFilter.toLowerCase();
     }).toList();
+  }
+
+  // Check if there are more pages to load
+  bool hasMorePages() {
+    String statusFilter = _getStatusFromFilter(selectedFilter);
+    return currentPage[statusFilter]! < totalPages[statusFilter]!;
+  }
+
+  // Get pagination info text
+  String getPaginationInfo() {
+    String statusFilter = _getStatusFromFilter(selectedFilter);
+    int showing = getFilteredBookings().length;
+    int total = totalItems[statusFilter]!;
+    return 'Showing $showing of $total';
   }
 
   // Calendar day selected
@@ -326,28 +448,41 @@ class HomeController extends GetxController {
       ),
     );
   }
-  Future<void> getProfile()async{
-    try{
-      final response=await ApiService.get(
+
+  Future<void> getProfile() async {
+    try {
+      final response = await ApiService.get(
           ApiEndPoint.user,
-          header: {
-            "Authorization": "Bearer ${LocalStorage.token}"
-          }
+          header: {"Authorization": "Bearer ${LocalStorage.token}"}
       );
-      if(response.statusCode==200){
-        final profileModel=ProfileModel.fromJson(response.data);
-        profileData=profileModel.data;
-        name.value=profileData?.name??"";
-        image.value=profileData?.image??"";
+      if (response.statusCode == 200) {
+        final profileModel = ProfileModel.fromJson(response.data);
+        profileData = profileModel.data;
+        name.value = profileData?.name ?? "";
+        image.value = profileData?.image ?? "";
 
         update();
-      }
-      else{
-        ///rtrfgg
+      } else {
         Utils.errorSnackBar(response.statusCode, response.message);
       }
+    } catch (e) {
+      Utils.errorSnackBar(0, e.toString());
     }
-    catch(e){
+  }
+  Future<void> getOnlineStatus() async {
+    try {
+      final response = await ApiService.get(
+          ApiEndPoint.getProvider,
+          header: {"Authorization": "Bearer ${LocalStorage.token}"}
+      );
+      if (response.statusCode == 200) {
+        isOnline=response.data['data']['isOnline']??false;
+
+        update();
+      } else {
+        Utils.errorSnackBar(response.statusCode, response.message);
+      }
+    } catch (e) {
       Utils.errorSnackBar(0, e.toString());
     }
   }

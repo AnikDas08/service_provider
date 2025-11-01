@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/config/api/api_end_point.dart';
+import 'package:haircutmen_user_app/config/route/app_routes.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:haircutmen_user_app/utils/constants/app_colors.dart';
 
@@ -65,14 +66,14 @@ class ViewDetailsUpcoming extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.zero,
-                          child: controller.userImage.value.isNotEmpty &&
-                              (controller.userImage.value
+                          child: controller.userImage.isNotEmpty &&
+                              (controller.userImage
                                   .startsWith('http') ||
-                                  controller.userImage.value
+                                  controller.userImage
                                       .startsWith('/'))
                               ? Image.network(
                             ApiEndPoint.imageUrl +
-                                controller.userImage.value,
+                                controller.userImage,
                             fit: BoxFit.cover,
                             errorBuilder:
                                 (context, error, stackTrace) {
@@ -96,7 +97,7 @@ class ViewDetailsUpcoming extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CommonText(
-                              text: controller.userName.value,
+                              text: controller.userName,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w500,
                               color: AppColors.black400,
@@ -183,7 +184,7 @@ class ViewDetailsUpcoming extends StatelessWidget {
                                 ),
                                 SizedBox(width: 4.w),
                                 CommonText(
-                                  text: controller.userLocation.value,
+                                  text: controller.userLocation,
                                   fontSize: 12.sp,
                                   color: AppColors.black300,
                                   fontWeight: FontWeight.w400,
@@ -211,11 +212,20 @@ class ViewDetailsUpcoming extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: CustomButton(
-                  text: AppString.contact_now_button,
+                  text: AppString.message_text,
                   fontSize: 18,
                   isSelected: true,
                   onTap: () async {
-
+                    print("Chat id : 😍😍😍😍 ${controller.chatId}");
+                    Get.toNamed(
+                        AppRoutes.message,
+                        parameters: {
+                          "id":controller.chatId
+                        },
+                        arguments: {
+                          "name":controller.userName,
+                          "image":controller.userImage,
+                        });
                   },
                 ),
               )

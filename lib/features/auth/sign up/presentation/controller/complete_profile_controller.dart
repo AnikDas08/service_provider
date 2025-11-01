@@ -130,7 +130,7 @@ class CompleteProfileController extends GetxController {
       isUploadingImage.value = true;
 
       await ApiService.multipart(
-        "user/profile",
+        "user/update-profile-image",
         method: "PATCH",
         imageName: "image",
         imagePath: profileImage.value!.path,

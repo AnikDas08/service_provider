@@ -88,22 +88,22 @@ class ProfileController extends GetxController {
         images.value = profileData?.image ?? "";*/
 
 
-        nameController.text = response.data["data"]["user"]["name"];
-        numberController.text = response.data["data"]["user"]["contact"];
-        name.value = response.data["data"]["user"]["name"];
-        phone.value = response.data["data"]["user"]["contact"];
-        email.value = response.data["data"]["user"]["email"];
-        location.value = response.data["data"]["user"]["location"];
-        images.value = response.data["data"]["user"]["image"];
-        category.value = response.data["data"]["services"][0]["category"]["name"];
+        nameController.text = response.data["data"]["user"]["name"] ?? "";
+        numberController.text = response.data["data"]["user"]["contact"] ?? "";
+        name.value = response.data["data"]["user"]["name"] ?? "";
+        phone.value = response.data["data"]["user"]["contact"] ?? "";
+        email.value = response.data["data"]["user"]["email"] ?? "";
+        location.value = response.data["data"]["user"]["location"] ?? "";
+        images.value = response.data["data"]["user"]["image"] ?? "";
+        category.value = response.data["data"]["services"]?[0]?["category"]?["name"] ?? "";
 
         update();
       } else {
         ///rtrfgg
-        Utils.errorSnackBar(response.statusCode, response.message);
+        //Utils.errorSnackBar(response.statusCode, response.message);
       }
     } catch (e) {
-      Utils.errorSnackBar(0, e.toString());
+      //Utils.errorSnackBar(0, e.toString());
     }
     isProfileLoading = false;
     update();
@@ -117,8 +117,8 @@ class ProfileController extends GetxController {
         header: {"Authorization": "Bearer ${LocalStorage.token}"},
       );
       if (response.statusCode == 200) {
-        rating.value = response.data["data"]["averageRating"];
-        review.value = response.data["data"]["totalReviews"];
+        rating.value = response.data["data"]["averageRating"]??0.0;
+        review.value = response.data["data"]["totalReviews"]??0;
         update();
       } else {
         Get.snackbar("Error", response.message);

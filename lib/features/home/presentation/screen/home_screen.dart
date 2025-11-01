@@ -34,19 +34,19 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       // Profile Image
                       Obx(
-                      ()=> CircleAvatar(
-                        radius: 24.r,
-                        backgroundImage: controller.image.value != ""
-                            ? NetworkImage(ApiEndPoint.socketUrl + controller.image.value)
-                            : const AssetImage("assets/images/profile_image.jpg") as ImageProvider,
-                        backgroundColor: Colors.transparent, // optional
-                      ),
+                            () => CircleAvatar(
+                          radius: 24.r,
+                          backgroundImage: controller.image.value != ""
+                              ? NetworkImage(ApiEndPoint.socketUrl + controller.image.value)
+                              : const AssetImage("assets/images/profile_image.jpg") as ImageProvider,
+                          backgroundColor: Colors.transparent,
+                        ),
                       ),
                       SizedBox(width: 12.w),
                       // Profile Info
                       Expanded(
                         child: Obx(
-                              ()=> Column(
+                              () => Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               CommonText(
@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
                           SizedBox(width: 4.w),
                           Switch(
                             value: controller.isOnline,
-                            onChanged: (val) => controller.toggleOnlineStatus(),
+                            onChanged: (val) => controller.onlineStatus(),
                             activeColor: AppColors.primaryColor,
                             activeTrackColor: AppColors.primaryColor.withOpacity(0.3),
                             inactiveThumbColor: Colors.grey[400],
@@ -86,15 +86,15 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 10),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           Get.toNamed(AppRoutes.notifications);
                         },
                         child: Icon(
-                            Icons.notifications_outlined,
-                            color: AppColors.black300,
-                            size: 24.sp
+                          Icons.notifications_outlined,
+                          color: AppColors.black300,
+                          size: 24.sp,
                         ),
                       ),
                     ],
@@ -198,9 +198,12 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(height: 16.h),
+                SizedBox(height: 12.h),
 
-                // Booking List with Loading State
+
+                SizedBox(height: 8.h),
+
+                // Booking List with Loading State and Pagination
                 Expanded(
                   child: controller.isLoading
                       ? Center(
@@ -229,12 +232,20 @@ class HomeScreen extends StatelessWidget {
                     ),
                   )
                       : RefreshIndicator(
-                    onRefresh: controller.fetchAllBookings,
+                    onRefresh: controller.refreshBookings,
                     color: AppColors.primaryColor,
                     child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: controller.scrollController, // Important for pagination!
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      itemCount: controller.getFilteredBookings().length,
+                      itemCount: controller.getFilteredBookings().length +
+                          (controller.isLoadingMore ? 1 : 0), // Add 1 for loading indicator
                       itemBuilder: (context, index) {
+                        // Show loading indicator at the end
+                        if (index == controller.getFilteredBookings().length) {
+                          return _buildLoadingIndicator();
+                        }
+
                         final booking = controller.getFilteredBookings()[index];
                         return _buildBookingCard(booking, controller);
                       },
@@ -246,6 +257,32 @@ class HomeScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  // Loading indicator widget for pagination
+  Widget _buildLoadingIndicator() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 16.h),
+      alignment: Alignment.center,
+      child: Column(
+        children: [
+          SizedBox(
+            width: 24.w,
+            height: 24.h,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          CommonText(
+            text: 'Loading more...',
+            fontSize: 12.sp,
+            color: AppColors.black300,
+          ),
+        ],
+      ),
     );
   }
 
@@ -335,6 +372,8 @@ class HomeScreen extends StatelessWidget {
                         fontSize: 14.sp,
                         color: AppColors.black400,
                         fontWeight: FontWeight.w400,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

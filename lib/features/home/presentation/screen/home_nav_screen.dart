@@ -34,10 +34,10 @@ class HomeNavScreen extends StatelessWidget {
           index: controller.selectedIndex.value,
           children: [
             const HomeScreen(),
-            const OverviewScreen(),
+            controller.selectedIndex.value == 1 ?OverviewScreen():Container(),
             controller.selectedIndex.value == 2 ? QRScannerScreen() : Container(),
-            ChatListScreen(),
-            const ProfileScreen(),
+            controller.selectedIndex.value == 3 ?ChatListScreen():Container(),
+            controller.selectedIndex.value == 4 ?ProfileScreen():Container(),
           ],
         ),
         bottomNavigationBar: Container(

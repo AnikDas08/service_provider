@@ -12,13 +12,14 @@ class UpcomingViewDetailsController extends GetxController {
 
   // Parsed fields for easy access - make them observable
   var bookingId = ''.obs;
-  var userName = ''.obs;
-  var userImage = ''.obs;
-  var userLocation = ''.obs;
+  var userName = '';
+  var userImage = '';
+  var userLocation = '';
   var serviceName = ''.obs;
   var date = ''.obs;
   var time = ''.obs;
   var amount = ''.obs;
+  String chatId = "";
 
   @override
   void onInit() {
@@ -38,6 +39,7 @@ class UpcomingViewDetailsController extends GetxController {
       final response = await ApiService.get('booking/$id');
 
       if (response.statusCode == 200) {
+        chatId=response.data['data'][0]['chatId']??"";
         // API returns data as a List, get the first item
         if (response.data['data'] is List && response.data['data'].isNotEmpty) {
           bookingData.value = response.data['data'][0];
@@ -45,6 +47,7 @@ class UpcomingViewDetailsController extends GetxController {
         } else if (response.data['data'] is Map) {
           // In case API returns single object
           bookingData.value = response.data['data'];
+          print("chat id 👌👌👌👌 $chatId");
           _parseBookingData();
         }
       }
@@ -64,12 +67,12 @@ class UpcomingViewDetailsController extends GetxController {
   void _parseBookingData() {
     // User details
     if (bookingData['user'] != null && bookingData['user'] is Map) {
-      userName.value = bookingData['user']['name'] ?? 'User';
-      userImage.value = bookingData['user']['image'] ?? '';
-      userLocation.value = bookingData['user']['location'] ?? 'Location';
+      userName = bookingData['user']['name'] ?? 'User';
+      userImage = bookingData['user']['image'] ?? '';
+      userLocation = bookingData['user']['location'] ?? 'Location';
     }
 
-    print("user name : 😍😍😍😍${userName.value}");
+    print("user name : 😍😍😍😍${userName}");
 
     // Service name from category
     if (bookingData['services'] != null && bookingData['services'] is List) {
