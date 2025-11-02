@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../data/model/notification_model.dart';
-import '../../repository/notification_repository.dart';
+import 'package:haircutmen_user_app/features/notifications/data/model/notification_model.dart';
+import 'package:haircutmen_user_app/features/notifications/repository/notification_repository.dart';
+import 'package:haircutmen_user_app/features/scan/presentation/widgets/review_scan_bottomsheet.dart';
+import '../../../../config/api/api_end_point.dart';
+import '../../../../services/api/api_service.dart';
 
 class NotificationsController extends GetxController {
   /// Notification List
-  List notifications = [];
+  List<NotificationModel> notifications = [];
 
   /// Notification Loading Bar
   bool isLoading = false;
@@ -22,8 +25,20 @@ class NotificationsController extends GetxController {
   /// Notification Scroll Controller
   ScrollController scrollController = ScrollController();
 
-  /// Notification More data Loading function
+  /// Rating value
+  RxInt selectedRating = 0.obs;
+  String? providerId;
 
+  /// Feedback controller
+  TextEditingController feedbackController = TextEditingController();
+
+  /// Current provider ID for review
+  String? currentProviderId;
+
+  /// Loading state for review submission
+  RxBool isSubmittingReview = false.obs;
+
+  /// Notification More data Loading function
   void moreNotification() {
     scrollController.addListener(() async {
       if (scrollController.position.pixels ==
@@ -46,7 +61,6 @@ class NotificationsController extends GetxController {
 
   /// Notification data Loading function
   getNotificationsRepo() async {
-    return;
     if (isLoading || hasNoData) return;
     isLoading = true;
     update();
@@ -62,15 +76,127 @@ class NotificationsController extends GetxController {
     update();
   }
 
-  /// Notification Controller Instance create here
+  /// Handle notification item click
+  void onNotificationTap(NotificationModel item) {
+    // Debug: check runtime type
+    print(item.runtimeType); // Must be NotificationModel
+    print("Id id ${item.title}");
+    if (item.title == "Booking Completed Successfully") {
+      providerId = item.referenceId?["_id"];
+      print("Provider Id 😍 $providerId");
+      if (providerId != null) {
+        // You can show review dialog here
+      } else {
+        Get.snackbar(
+          'Error',
+          'Provider information not found',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    }
+  }
+
+  /// Set rating
+  void setRating(int rating) {
+    selectedRating.value = rating;
+  }
+
+  /// Show review bottom sheet
+  void showReviewBottomSheet(String providerId) {
+    selectedRating.value = 0;
+    feedbackController.clear();
+    currentProviderId = providerId;
+    // Show review dialog if needed
+  }
+
+  /// Submit review to API
+  Future<void> submitReview() async {
+    if (selectedRating.value == 0) {
+      Get.snackbar(
+        'Error',
+        'Please select a rating',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (feedbackController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please write a review',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    try {
+      isSubmittingReview.value = true;
+
+      Map<String, dynamic> body = {
+        "providerId": providerId,
+        "rating": selectedRating.value,
+        "comment": feedbackController.text.trim(),
+      };
+
+      final response = await ApiService.post(
+        "review",
+        body: body,
+        header: {'Content-Type': 'application/json'},
+      );
+
+      isSubmittingReview.value = false;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Get.back();
+        Get.snackbar(
+          'Success',
+          'Review submitted successfully',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+
+        selectedRating.value = 0;
+        feedbackController.clear();
+        currentProviderId = null;
+      } else {
+        Get.snackbar(
+          'Error',
+          response.message ?? 'Failed to submit review',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      isSubmittingReview.value = false;
+      Get.snackbar(
+        'Error',
+        'An error occurred: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  /// Controller instance
   static NotificationsController get instance =>
       Get.put(NotificationsController());
 
-  /// Controller on Init
+  /// On Init
   @override
   void onInit() {
     getNotificationsRepo();
     moreNotification();
     super.onInit();
+  }
+
+  /// Dispose controllers
+  @override
+  void onClose() {
+    scrollController.dispose();
+    feedbackController.dispose();
+    super.onClose();
   }
 }

@@ -122,7 +122,7 @@ class OnboardingScreen extends StatelessWidget {
       children: [
         // Log In Button (Outlined)
         CommonButton(
-          titleText: "Log In",
+          titleText: AppString.login_text,
           titleColor: AppColors.primaryColor,
           buttonColor: AppColors.transparent,
           borderColor: AppColors.primaryColor,
@@ -137,7 +137,7 @@ class OnboardingScreen extends StatelessWidget {
 
         // Sign Up Button (Filled)
         CommonButton(
-          titleText: "Sign Up",
+          titleText: AppString.signUp,
           titleColor: AppColors.white,
           buttonColor: AppColors.primaryColor,
           borderColor: AppColors.primaryColor,

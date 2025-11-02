@@ -208,14 +208,14 @@ class ViewDetailsPending extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               title: CommonText(
-                                text: 'Cancel Booking',
+                                text: AppString.cancelBooking,
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                               content: CommonText(
                                 maxLines: 4,
                                 text:
-                                'Are you sure you want to cancel this booking?',
+                                AppString.cancleBookingSure,
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -266,14 +266,14 @@ class ViewDetailsPending extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               title: CommonText(
-                                text: 'Confirm Booking',
+                                text: AppString.confirmBooking,
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                               content: CommonText(
                                 maxLines: 4,
                                 text:
-                                'Are you sure you want to confirm this booking?',
+                                AppString.confirmBookingSure,
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w400,
                               ),

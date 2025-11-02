@@ -265,7 +265,7 @@ class EditServiceScreen extends StatelessWidget {
             ),
             child: Center(
               child: CommonText(
-                text: "No images available",
+                text: AppString.noImageAvailable,
                 fontSize: 14.sp,
                 color: AppColors.black400,
                 textAlign: TextAlign.center,
@@ -311,7 +311,7 @@ class EditServiceScreen extends StatelessWidget {
                 children: [
                   // Service dropdown
                   _buildFieldWithLabel(
-                    label: index == 0 ? "Service" : "Service ${index + 1}",
+                    label: index == 0 ? AppString.service_text : "${AppString.service_text} ${index + 1}",
                     child: _buildDropdownField(
                       controller: controller,
                       textController: pair.serviceController,
@@ -324,12 +324,12 @@ class EditServiceScreen extends StatelessWidget {
 
                   // Service Type dropdown (depends on selected service)
                   _buildFieldWithLabel(
-                    label: index == 0 ? "Service Type" : "Service Type ${index + 1}",
+                    label: index == 0 ? AppString.service_type : "${AppString.service_type} ${index + 1}",
                     child: GetBuilder<EditServiceController>(
                       builder: (controller) => _buildDropdownField(
                         controller: controller,
                         textController: pair.serviceTypeController,
-                        hintText: "Select Service Type",
+                        hintText: AppString.selectServiceType,
                         items: pair.serviceController.text.isNotEmpty
                             ? controller.getServiceTypes(pair.serviceController.text)
                             : [],
@@ -404,7 +404,7 @@ class EditServiceScreen extends StatelessWidget {
           alignment: Alignment.topRight,
           child: IntrinsicWidth(
             child: CustomButton(
-              text: "  Add Service  ",
+              text: AppString.addService,
               isSelected: true,
               height: 44.h,
               onTap: controller.addService,
@@ -436,7 +436,7 @@ class EditServiceScreen extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: Obx(() => CommonText(
                             text: controller.selectedLanguages.isEmpty
-                                ? "Select Languages"
+                                ? AppString.selectedLanguageHere
                                 : controller.selectedLanguages.join(', '),
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w400,
@@ -569,7 +569,7 @@ class EditServiceScreen extends StatelessWidget {
               ),
               SizedBox(height: 20.h),
               CommonText(
-                text: "Select Languages",
+                text: AppString.selectedLanguageHere,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.black,
@@ -577,7 +577,7 @@ class EditServiceScreen extends StatelessWidget {
               ),
               SizedBox(height: 8.h),
               CommonText(
-                text: "You can select multiple languages",
+                text: AppString.editLanguage,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 color: AppColors.black400,
@@ -644,7 +644,7 @@ class EditServiceScreen extends StatelessWidget {
                     onTap: () => Navigator.pop(context),
                     child: Center(
                       child: CommonText(
-                        text: "Done",
+                        text: AppString.done,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
                         color: AppColors.white,
@@ -897,7 +897,7 @@ class EditServiceScreen extends StatelessWidget {
               ),
               SizedBox(height: 20.h),
               CommonText(
-                text: "Select Option",
+                text: AppString.selectOption,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.black,

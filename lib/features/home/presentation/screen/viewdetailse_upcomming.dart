@@ -164,7 +164,7 @@ class ViewDetailsUpcoming extends StatelessWidget {
                                   color: AppColors.black300,
                                 ),
                                 CommonText(
-                                  text: 'Booking ID: ${controller.bookingId.value}',
+                                  text: '${AppString.bookingid} ${controller.bookingId.value}',
                                   fontSize: 12.sp,
                                   color: AppColors.black300,
                                   fontWeight: FontWeight.w400,

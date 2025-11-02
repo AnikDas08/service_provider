@@ -25,7 +25,7 @@ class QRScannerScreen extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              CustomAppBar(title: "Scan",showBackButton: false,),
+              CustomAppBar(title: AppString.scan,showBackButton: false,),
               SizedBox(height: 12.h),
               CommonText(
                 text: AppString.qr_details,
@@ -58,7 +58,7 @@ class QRScannerScreen extends StatelessWidget {
                       )
                           : Center(
                         child: Text(
-                          "Scanner is paused",
+                          AppString.pauseScan,
                           style: TextStyle(fontSize: 16.sp, color: Colors.black54),
                         ),
                       );
@@ -104,7 +104,7 @@ class QRScannerScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       const Text(
-                        "Scan",
+                        AppString.scan,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -125,7 +125,7 @@ class QRScannerScreen extends StatelessWidget {
                   ),
                   SizedBox(width: 10,),
                   CommonText(
-                    text: "OR",
+                    text: AppString.or,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
                     color: AppColors.black400,
@@ -162,7 +162,7 @@ class QRScannerScreen extends StatelessWidget {
                     color: AppColors.primaryColor,
                   ),
                   decoration: InputDecoration(
-                    hintText: "Type User Id",
+                    hintText: AppString.userId,
                     hintStyle: TextStyle(
                       fontSize: 16.sp,
                       color: AppColors.red100,

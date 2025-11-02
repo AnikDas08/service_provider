@@ -22,6 +22,7 @@ class SignUpController extends GetxController {
   String completePhoneNumber = ''; // Stores phone with country code
   String countryCode = '+880'; // Stores selected country code
   String countryFlag = '🇧🇩';
+  String totalCountry="";
 
   //Timer? _timer;
   //int start = 0;
@@ -61,6 +62,7 @@ class SignUpController extends GetxController {
     text: kDebugMode ? '23456' : '',
   );
 
+
   @override
   void dispose() {
     //_timer?.cancel();
@@ -80,13 +82,14 @@ class SignUpController extends GetxController {
   signUpUser() async {
     if (!signUpFormKey.currentState!.validate()) return;
     //Get.toNamed(AppRoutes.verifyUser);
+    String fullPhoneNumber = countryCode + phoneNumberController.text;
     isLoading = true;
     update();
     Map<String, String> body = {
       "role":"PROVIDER",
       "name":nameController.text,
       "email":emailController.text,
-      "contact":phoneNumberController.text,
+      "contact":fullPhoneNumber,
       "location":locationController.text,
       "password": passwordController.text,
       "referralCode":referralController.text,
@@ -137,7 +140,11 @@ class SignUpController extends GetxController {
     update();
     print("email is : ${emailController.text}");
     print("otp is : ${otpController.text}");
-    Map<String, String> body = {"email": emailController.text,"oneTimeCode": otpController.text};
+    Map<String, String> body =
+    {
+      "email": emailController.text,
+      "oneTimeCode": otpController.text
+    };
     Map<String, String> header = {"SignUpToken": "signUpToken $signUpToken"};
     var response = await ApiService.post(
       ApiEndPoint.verifyUser,

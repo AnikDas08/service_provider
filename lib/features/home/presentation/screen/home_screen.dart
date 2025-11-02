@@ -223,7 +223,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 16.h),
                         CommonText(
-                          text: 'No bookings found',
+                          text: AppString.nobookingfound,
                           fontSize: 16.sp,
                           color: Colors.grey[600]!,
                           fontWeight: FontWeight.w500,
@@ -413,7 +413,7 @@ class HomeScreen extends StatelessWidget {
                   Row(
                     children: [
                       CommonText(
-                        text: 'Booking ID: ${controller.getBookingId(booking)}',
+                        text: '${AppString.bookingid} ${controller.getBookingId(booking)}',
                         fontSize: 12.sp,
                         color: AppColors.black300,
                         fontWeight: FontWeight.w400,

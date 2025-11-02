@@ -54,7 +54,7 @@ class ServiceProfileScreen extends StatelessWidget {
                   SizedBox(height: 12.h),
                   Obx(() => CommonText(
                     text: controller.aboutMe.value.isEmpty
-                        ? 'No information available'
+                        ? AppString.noinformation
                         : controller.aboutMe.value,
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
@@ -69,7 +69,7 @@ class ServiceProfileScreen extends StatelessWidget {
                   Obx(() => Row(
                     children: [
                       CommonText(
-                        text: "Spoken : ",
+                        text: AppString.spoken,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: AppColors.black400,
@@ -102,7 +102,7 @@ class ServiceProfileScreen extends StatelessWidget {
                       SizedBox(width: 4.w),
                       CommonText(
                         text: controller.primaryLocation.value.isEmpty
-                            ? 'Location not specified'
+                            ? AppString.nolocation
                             : controller.primaryLocation.value,
                         fontSize: 16.sp,
                         color: AppColors.black300,
@@ -118,7 +118,7 @@ class ServiceProfileScreen extends StatelessWidget {
                   Obx(() => Row(
                     children: [
                       CommonText(
-                        text: "Service Distance : ",
+                        text: AppString.serviceDistance,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: AppColors.black400,
@@ -140,7 +140,7 @@ class ServiceProfileScreen extends StatelessWidget {
                   Obx(() => Row(
                     children: [
                       CommonText(
-                        text: "Price Per Hour : ",
+                        text: AppString.priceperHour,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: AppColors.black400,
@@ -202,7 +202,7 @@ class ServiceProfileScreen extends StatelessWidget {
                     ),
                     child: Center(
                       child: CommonText(
-                        text: "No work photos available",
+                        text: AppString.workPhotNo,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: AppColors.black300,
@@ -266,7 +266,7 @@ class ServiceProfileScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.all(12.w),
                 child: CommonText(
-                  text: "Service",
+                  text: AppString.service_text,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.black400,
@@ -276,7 +276,7 @@ class ServiceProfileScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.all(12.w),
                 child: CommonText(
-                  text: "Service Type",
+                  text: AppString.service_type,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.black400,
@@ -286,7 +286,7 @@ class ServiceProfileScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.all(12.w),
                 child: CommonText(
-                  text: "Price",
+                  text: AppString.price_text,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.black400,

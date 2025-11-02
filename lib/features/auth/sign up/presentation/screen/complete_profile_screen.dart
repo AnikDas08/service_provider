@@ -79,6 +79,7 @@ class CompleteProfileScreen extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 60.r,
+          backgroundColor: AppColors.black50, // Add background color
           child: ClipRRect(
             borderRadius: BorderRadius.circular(60.r),
             child: controller.profileImage.value != null
@@ -87,12 +88,29 @@ class CompleteProfileScreen extends StatelessWidget {
               width: 120.w,
               height: 120.h,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                // If file image fails, show default
+                return Image.asset(
+                  "assets/images/noImage.png",
+                  width: 120.w,
+                  height: 120.h,
+                  fit: BoxFit.cover,
+                );
+              },
             )
                 : Image.asset(
-              "assets/images/item_image.png",
+              "assets/images/noImage.png",
               width: 120.w,
               height: 120.h,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                // If asset doesn't exist, show placeholder
+                return Icon(
+                  Icons.person,
+                  size: 60.sp,
+                  color: AppColors.black200,
+                );
+              },
             ),
           ),
         ),

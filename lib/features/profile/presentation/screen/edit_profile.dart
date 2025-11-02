@@ -181,7 +181,7 @@ class EditProfile extends StatelessWidget {
                   ? null
                   : controller.selectedLocation.value,
               hint: CommonText(
-                text: 'Select Location',
+                text: AppString.selectLocation,
                 fontSize: 12,
                 color: AppColors.black200,
                 textAlign: TextAlign.left,

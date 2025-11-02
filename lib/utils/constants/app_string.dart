@@ -61,7 +61,8 @@ class AppString {
   static const String logOut = "Log Out";
   static const String privacyPolicy = "Privacy Policy";
   static const String deleteAccount = "Delete account";
-  static const String termsOfServices = "Terms of Services";
+  static const String termsOfServices = "Terms & Condition";
+  static const String serviceProviderPolicy = "Service Provider Usage Policy";
   static const String noInternetConnection = "No internet connection";
   static const String badResponseRequest = "Bad Response Request";
   static const String requestTimeOut = "Request Time Out";
@@ -139,6 +140,8 @@ class AppString {
   static const String hint_confirm_password="Enter Confirm Password";
   static const String confirm_button="Confirm";
   static const String password_change_now="Your Password Has Been\nChanged";
+  static const String favourite="Favorite";
+  static const String favouriteScreen="Favorite Screen";
 
 
   /// Complete Profile
@@ -182,6 +185,24 @@ class AppString {
   static const String email_address_text="Email Address";
   static const String contact_now_button="Contact Now";
   static const String cancel_button="Cancel";
+  static const String nobookingfound="No bookings found";
+  static const String bookingid="Booking ID:";
+  static const String chatid="Chat ID:";
+  static const String home="Home";
+  static const String overview="Overview";
+  static const String qr="QR Code";
+  static const String message="Message";
+  static const String viewProfile="View Profile";
+  static const String distance="Distance";
+  static const String availability="Availability";
+  static const String serviceFee="Service Fee";
+  static const String workPhoto="Work (Photos)";
+  static const String review="Reviews";
+  static const String bookNow="Book Now";
+  static const String cancelBooking="Cancel Booking";
+  static const String cancleBookingSure="Are you sure you want to cancel this booking?";
+  static const String confirmBooking="Confirm Booking";
+  static const String confirmBookingSure="Are you sure you want to confirm this booking?";
 
   /// Overview Screen
   static const String overview_button="My Overview";
@@ -190,6 +211,7 @@ class AppString {
   static const String successful_booking="Successful Booking";
   static const String cancel_booking="Canceled Booking";
   static const String total_amount="Total  Money Earned";
+  static const String months="All Months";
 
 
   ///
@@ -201,6 +223,7 @@ class AppString {
   static const String thursday_text="Thursday";
   static const String friday_text="Friday";
   static const String select_month="Select Month";
+  static const String allMonthYear="All Months (Yearly Data)";
 
   ///
   static const String january_text="January";
@@ -222,6 +245,8 @@ class AppString {
 
   /// Message Screen
   static const String search_text="Search here";
+  static const String selected_year="Select Year";
+  static const String selected_month="Select Month";
 
 
   /// Profile Screen
@@ -248,6 +273,7 @@ class AppString {
   static const String serbian_language="Serbian";
   static const String change_password="Change Password";
   static const String privacy_policy="Privacy Policy";
+  static const String service_provider_policy="Service Provider Usage Policy";
   static const String terms_conditions="Terms & Conditions";
   static const String log_out="Log Out";
   static const String delete_account="Delete Account";
@@ -257,6 +283,20 @@ class AppString {
   static const String logout_correct="Do you want to logout?";
   static const String yes_button="Yes";
   static const String no_button="No";
+  static const String noinformation="No information available";
+  static const String spoken="Spoken : ";
+  static const String nolocation="Location not specified";
+  static const String serviceDistance="Service Distance : ";
+  static const String priceperHour="Price Per Hour : ";
+  static const String workPhotNo="No work photos available";
+  static const String noImageAvailable="No images available";
+  static const String selectServiceType="Select Service Type";
+  static const String addService="  Add Service  ";
+  static const String selectedLanguageHere="Select Languages";
+  static const String editLanguage="You can select multiple languages";
+  static const String selectOption="Select Option";
+  static const String selectLocation="Select Location";
+  static const String subject="Subject";
 
 
 
@@ -265,5 +305,9 @@ class AppString {
   static const String qr_details = "Please allow service provider to scan QR code below to complete the service.";
   static const String qr_name = "MD Kamran khan";
   static const String qr_id = "User ID : ";
+  static const String userId = "Type User Id";
+  static const String or = "Or";
+  static const String scan = "Scan";
+  static const String pauseScan = "Scanner is paused";
   static const String privacy_policy_texts = "Lorem ipsum dolor sit amet consectetur. Eget imperdiet ultrices adipiscing et vitae adipiscing ornare. Vel tristique lorem viverra lorem sem consequat cras dui. Nisl libero nisl nec vulputate quam quis. Orci tempor pulvinar amet mi at et ac ipsum. Sed non massa accumsan dolor venenatis eleifend. Netus semper integer purus praesent nulla porttitor nibh. Lobortis ornare feugiat dictum eu cursus a platea fermentum. Tellus dolor a sit morbi. Elementum diam tortor est erat ultricies quam sed nibh. Eros pellentesque eu est lectus. Nunc facilisi ipsum senectus dolor adipiscing id pretium consectetur. Hendrerit aliquam lectus urna at commodo ultrices volutpat pulvinar donec. In ut sagittis placerat ut in. Sit erat accumsan eget libero fringilla metus. Est venenatis commodo ut velit non aenean in pulvinar. Pretium pretium aliquet at nec ut malesuada augue sed a. Turpis vestibulum dolor leo aliquam rhoncus fermentum. Elit congue diam euismod tempus nunc bibendum. Tempus sit dis sem non dignissim.";
 }

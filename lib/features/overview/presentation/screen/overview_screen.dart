@@ -183,7 +183,7 @@ class OverviewScreen extends StatelessWidget {
                                         children: [
                                           Obx(() => CommonText(
                                             text: controller.selectedMonth.value.isEmpty
-                                                ? "All Months"
+                                                ? AppString.months
                                                 : controller.selectedMonth.value,
                                             fontSize: 14.sp,
                                             color: controller.selectedMonth.value.isEmpty
@@ -552,7 +552,7 @@ class OverviewScreen extends StatelessWidget {
                         : Colors.grey,
                   )),
                   title: CommonText(
-                    text: "All Months (Yearly Data)",
+                    text: AppString.allMonthYear,
                     fontSize: 16.sp,
                     fontWeight: controller.selectedMonth.value.isEmpty
                         ? FontWeight.w600
@@ -607,7 +607,7 @@ class OverviewScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: CommonText(text: 'Select Year', fontSize: 18.sp, fontWeight: FontWeight.w600),
+          title: CommonText(text: AppString.selected_year, fontSize: 18.sp, fontWeight: FontWeight.w600),
           content: SizedBox(
             width: double.minPositive,
             child: ListView.builder(

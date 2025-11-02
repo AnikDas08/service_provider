@@ -29,7 +29,7 @@ class ContractsScreen extends StatelessWidget {
                 CustomAppBar(title: AppString.contact_support,),
                 SizedBox(height: 30.h,),
                 CommonText(
-                    text: "Subject",
+                    text: AppString.subject,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: AppColors.black400,
@@ -41,7 +41,7 @@ class ContractsScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 20.h,),
                 CommonText(
-                    text: "Message",
+                    text: AppString.message,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: AppColors.black400,

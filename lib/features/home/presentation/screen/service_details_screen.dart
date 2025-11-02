@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/utils/constants/app_string.dart';
 import '../../../../component/button/common_button.dart';
 import '../../../../component/image/common_image.dart';
 import '../../../../component/text/common_text.dart';
@@ -143,7 +144,7 @@ class ServiceDetailsScreen extends StatelessWidget {
                 SizedBox(width: 16.w),
 
                 CommonText(
-                  text: "View Profile",
+                  text: AppString.viewProfile,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryColor,
@@ -207,7 +208,7 @@ class ServiceDetailsScreen extends StatelessWidget {
                   ),
                   SizedBox(width: 6.w),
                   CommonText(
-                    text: "Distance : ${provider["distance"] ?? ""}",
+                    text: "${AppString.distance} : ${provider["distance"] ?? ""}",
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: AppColors.black600,
@@ -247,7 +248,7 @@ class ServiceDetailsScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20.r),
             ),
             child: CommonText(
-              text: "Availability",
+              text: AppString.availability,
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: AppColors.primaryColor,
@@ -264,7 +265,7 @@ class ServiceDetailsScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CommonText(
-          text: "Spoken :",
+          text: AppString.spoken,
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.textColor,
@@ -290,7 +291,7 @@ class ServiceDetailsScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CommonText(
-          text: "Service Fee",
+          text: AppString.availability,
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.textColor,
@@ -316,7 +317,7 @@ class ServiceDetailsScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CommonText(
-          text: "About Me",
+          text: AppString.aboutMe,
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.textColor,
@@ -344,7 +345,7 @@ class ServiceDetailsScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CommonText(
-          text: "Work (Photos)",
+          text: AppString.workPhoto,
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.textColor,
@@ -370,7 +371,7 @@ class ServiceDetailsScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CommonText(
-          text: "Reviews",
+          text: AppString.review,
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.textColor,
@@ -406,7 +407,7 @@ class ServiceDetailsScreen extends StatelessWidget {
       ),
       child: SafeArea(
         child: CommonButton(
-          titleText: "Book Now",
+          titleText: AppString.bookNow,
           onTap: controller.onBookNow,
           buttonRadius: 8.r,
           buttonHeight: 50.h,

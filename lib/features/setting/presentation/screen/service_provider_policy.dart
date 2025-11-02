@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:haircutmen_user_app/features/setting/presentation/controller/service_provider_controller.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
 import 'package:haircutmen_user_app/utils/constants/app_colors.dart';
 import '../../../../component/text/common_text.dart';
+import '../../../../utils/constants/app_string.dart';
 
 class ServiceProviderPolicy extends StatelessWidget {
   const ServiceProviderPolicy({super.key});
@@ -14,19 +17,22 @@ class ServiceProviderPolicy extends StatelessWidget {
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                CustomAppBar(title: "Service Provider Usage Policy",),
-                SizedBox(height: 20,),
-                CommonText(
-                  text: "Service Provider Usage Policy",
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                  textAlign: TextAlign.start,
-                  maxLines: 50,
-                  color: AppColors.black300,
-                )
-              ],
+            child: GetBuilder<ServiceProviderController>(
+              init:ServiceProviderController(),
+              builder: (controller)=> Column(
+                children: [
+                  CustomAppBar(title: AppString.service_provider_policy,),
+                  SizedBox(height: 20,),
+                  CommonText(
+                    text: controller.data.content,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    textAlign: TextAlign.start,
+                    maxLines: 50,
+                    color: AppColors.black300,
+                  )
+                ],
+              ),
             ),
           ),
         )
