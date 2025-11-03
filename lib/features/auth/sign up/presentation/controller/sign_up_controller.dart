@@ -22,7 +22,6 @@ class SignUpController extends GetxController {
   String completePhoneNumber = ''; // Stores phone with country code
   String countryCode = '+880'; // Stores selected country code
   String countryFlag = '🇧🇩';
-  String totalCountry="";
 
   //Timer? _timer;
   //int start = 0;
@@ -44,10 +43,10 @@ class SignUpController extends GetxController {
     text: kDebugMode ? "developernaimul00@gmail.com" : '',
   );
   TextEditingController passwordController = TextEditingController(
-    text: kDebugMode ? 'asdfghjk9' : '',
+    text: kDebugMode ? 'hello123' : '',
   );
   TextEditingController confirmPasswordController = TextEditingController(
-    text: kDebugMode ? 'asdfghjk9' : '',
+    text: kDebugMode ? 'hello123' : '',
   );
   TextEditingController phoneNumberController = TextEditingController(
     text: kDebugMode ? '1865965581' : '',
@@ -70,7 +69,10 @@ class SignUpController extends GetxController {
   }
 
   onCountryChange(Country value) {
+    update();
     countryCode = value.dialCode.toString();
+    print("😍😍😍😍 ${countryCode}");
+    update();
   }
 
 
@@ -82,14 +84,15 @@ class SignUpController extends GetxController {
   signUpUser() async {
     if (!signUpFormKey.currentState!.validate()) return;
     //Get.toNamed(AppRoutes.verifyUser);
-    String fullPhoneNumber = countryCode + phoneNumberController.text;
+    print("Country code 😍😍😍😍 ${countryCode}");
     isLoading = true;
     update();
     Map<String, String> body = {
       "role":"PROVIDER",
       "name":nameController.text,
       "email":emailController.text,
-      "contact":fullPhoneNumber,
+      "contact": phoneNumberController.text,
+      "countryCode":countryCode,
       "location":locationController.text,
       "password": passwordController.text,
       "referralCode":referralController.text,

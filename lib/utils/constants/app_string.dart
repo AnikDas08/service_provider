@@ -203,6 +203,7 @@ class AppString {
   static const String cancleBookingSure="Are you sure you want to cancel this booking?";
   static const String confirmBooking="Confirm Booking";
   static const String confirmBookingSure="Are you sure you want to confirm this booking?";
+  static const String service_available="No Service Available";
 
   /// Overview Screen
   static const String overview_button="My Overview";

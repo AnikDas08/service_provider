@@ -88,7 +88,7 @@ class PersonalInformationScreen extends StatelessWidget {
                           SizedBox(height: 12),
                           InformationRow(title: AppString.email,value: controller.email.value,),
                           SizedBox(height: 12),
-                          InformationRow(title: AppString.contact,value: controller.phone.value,),
+                          InformationRow(title: AppString.contact,value: controller.fullNumber.value,),
                           SizedBox(height: 12),
                           InformationRow(title: AppString.location,value: controller.location.value,),
                           SizedBox(height: 12),

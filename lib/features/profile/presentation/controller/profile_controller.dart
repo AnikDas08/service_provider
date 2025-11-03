@@ -46,6 +46,8 @@ class ProfileController extends GetxController {
 
   ProfileData? profileData;
   bool isProfileLoading = false;
+  var countrCode = "".obs;
+  var fullNumber = "".obs;
 
   @override
   void onInit() {
@@ -96,6 +98,8 @@ class ProfileController extends GetxController {
         location.value = response.data["data"]["user"]["location"] ?? "";
         images.value = response.data["data"]["user"]["image"] ?? "";
         category.value = response.data["data"]["services"]?[0]?["category"]?["name"] ?? "";
+        countrCode.value = response.data["data"]["user"]["countryCode"];
+        fullNumber.value = countrCode.value +" "+ phone.value;
 
         update();
       } else {

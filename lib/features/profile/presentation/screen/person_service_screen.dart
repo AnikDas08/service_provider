@@ -169,7 +169,7 @@ class ServiceProfileScreen extends StatelessWidget {
                     ),
                     child: Center(
                       child: CommonText(
-                        text: "No services available",
+                        text: AppString.service_available,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: AppColors.black300,

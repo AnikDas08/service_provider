@@ -208,7 +208,7 @@ class _SignUpAllFieldState extends State<SignUpAllField> {
                 setState(() {
                   selectedCountry = country;
                   // Update complete phone number when country changes
-                  _updatePhoneWithCode();
+                  widget.controller.countryCode = '+${country.phoneCode}';
                 });
               },
               countryListTheme: CountryListThemeData(

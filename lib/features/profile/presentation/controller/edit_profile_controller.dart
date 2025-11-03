@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:haircutmen_user_app/services/storage/storage_services.dart';
 import 'package:haircutmen_user_app/utils/helpers/other_helper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:country_picker/country_picker.dart';
 
 import '../../../../config/api/api_end_point.dart';
 import '../../../../services/api/api_service.dart';
@@ -27,8 +28,15 @@ class EditProfileController extends GetxController {
   /// edit button loading here
   bool isLoading = false;
 
-  bool isProfileLoading=false;
+  bool isProfileLoading = false;
   ProfileData? profileData;
+
+  // Country code with observable
+  var countryCode = "+880".obs; // Default to Bangladesh
+  var countryDialCode = "+880";
+  var countryFlag = "🇧🇩".obs; // Default Bangladesh flag
+  var countryIsoCode = "BD".obs; // Default country ISO code
+  var fullNumber = "";
 
   /// all controller here
   TextEditingController nameController = TextEditingController();
@@ -70,13 +78,51 @@ class EditProfileController extends GetxController {
     selectedLocation.value = location;
   }
 
+  // Update country code with flag
+  void updateCountry(Country country) {
+    countryCode.value = "+${country.phoneCode}";
+    countryDialCode = "+${country.phoneCode}";
+    countryFlag.value = country.flagEmoji;
+    countryIsoCode.value = country.countryCode;
+    update();
+  }
+
+  // Show country picker
+  void openCountryPicker(BuildContext context) {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      countryListTheme: CountryListThemeData(
+        flagSize: 25,
+        backgroundColor: Colors.white,
+        textStyle: TextStyle(fontSize: 16, color: Colors.blueGrey),
+        bottomSheetHeight: 500,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+        inputDecoration: InputDecoration(
+          labelText: 'Search',
+          hintText: 'Start typing to search',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: const Color(0xFF8C98A8).withOpacity(0.2),
+            ),
+          ),
+        ),
+      ),
+      onSelect: (Country country) {
+        updateCountry(country);
+      },
+    );
+  }
+
   @override
   void onInit() {
     super.onInit();
     getProfile();
   }
-
-
 
   /// select image function here
   getProfileImage() async {
@@ -84,44 +130,55 @@ class EditProfileController extends GetxController {
     update();
   }
 
-  /// select language  function here
+  /// select language function here
   selectLanguage(int index) {
     selectedLanguage = languages[index];
     update();
     Get.back();
   }
 
-  Future<void> getProfile()async{
-    isProfileLoading=true;
+  Future<void> getProfile() async {
+    isProfileLoading = true;
     update();
-    try{
-      final response=await ApiService.get(
+    try {
+      final response = await ApiService.get(
           ApiEndPoint.user,
-          header: {
-            "Authorization": "Bearer ${LocalStorage.token}"
-          }
+          header: {"Authorization": "Bearer ${LocalStorage.token}"}
       );
-      if(response.statusCode==200){
-        final profileModel=ProfileModel.fromJson(response.data);
-        print("ksdljkdlsjfdkfj 😂😂😂😂😂😂😂 $profileModel");
+      if (response.statusCode == 200) {
+        final profileModel = ProfileModel.fromJson(response.data);
+        print("Profile Model 😂😂😂😂😂😂😂 $profileModel");
         profileData = profileModel.data;
-        print("ksdljkdlsjfdkfj $profileData");
-        nameController.text=profileData?.name??"";
-        numberController.text=profileData?.contact??"";
-        locationController.text=profileData?.location??"";
-        primaryLocationController.text=profileData?.location??"";
-      }
-      else{
-        ///rtrfgg
+        print("Profile Data: $profileData");
+
+        nameController.text = profileData?.name ?? "";
+        numberController.text = profileData?.contact ?? "";
+        locationController.text = profileData?.location ?? "";
+        primaryLocationController.text = profileData?.location ?? "";
+
+        // Set country code from API
+        if (response.data["data"]["countryCode"] != null) {
+          String apiCountryCode = response.data["data"]["countryCode"];
+          countryDialCode = apiCountryCode;
+          countryCode.value = apiCountryCode;
+
+          // Get country from code to set flag
+          try {
+            Country country = CountryParser.parsePhoneCode(apiCountryCode.replaceAll("+", ""));
+            countryFlag.value = country.flagEmoji;
+            countryIsoCode.value = country.countryCode;
+          } catch (e) {
+            print("Could not parse country from code: $e");
+          }
+        }
+      } else {
         Utils.errorSnackBar(response.statusCode, response.message);
       }
-    }
-    catch(e){
+    } catch (e) {
       Utils.errorSnackBar(0, e.toString());
     }
-    isProfileLoading=false;
+    isProfileLoading = false;
     update();
-
   }
 
   Future<void> handleImageUpload() async {
@@ -266,11 +323,15 @@ class EditProfileController extends GetxController {
     update();
 
     try {
+      // Combine country code with phone number
+      fullNumber = countryDialCode + numberController.text.trim();
+
       // Prepare body
       Map<String, String> body = {
         "name": nameController.text.trim(),
         "contact": numberController.text.trim(),
-        "location": locationController.text.trim(),
+        "countryCode": countryDialCode,
+        "location": primaryLocationController.text.trim(),
       };
 
       String? imagePath = profileImage.value?.path;
@@ -293,11 +354,13 @@ class EditProfileController extends GetxController {
             location: data['location'] ?? profileData?.location,
             image: data['image'] ?? profileData?.image,
           );
-          final profileModel=ProfileModel.fromJson(response.data);
+          final profileModel = ProfileModel.fromJson(response.data);
           update();
-          Utils.successSnackBar("Successfully Submit for Approval Your Data", response.message);
+          Utils.successSnackBar(
+              "Successfully Submit for Approval Your Data", response.message);
         } else {
-          Utils.errorSnackBar(response.statusCode, "No data returned from server");
+          Utils.errorSnackBar(
+              response.statusCode, "No data returned from server");
         }
       } else {
         Utils.errorSnackBar(response.statusCode, response.message);
@@ -309,8 +372,4 @@ class EditProfileController extends GetxController {
     isLoading = false;
     update();
   }
-
-
-
-
 }
