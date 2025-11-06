@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:haircutmen_user_app/component/text/common_text.dart';
 import 'package:haircutmen_user_app/features/home/presentation/controller/home_nav_controller.dart';
 import 'package:haircutmen_user_app/features/home/presentation/screen/home_screen.dart';
 import 'package:haircutmen_user_app/features/message/presentation/screen/chat_screen.dart';
@@ -34,49 +33,70 @@ class HomeNavScreen extends StatelessWidget {
         body: IndexedStack(
           index: controller.selectedIndex.value,
           children: [
-            controller.selectedIndex.value == 0 ? HomeScreen():Container(),
-            controller.selectedIndex.value == 1 ?OverviewScreen():Container(),
+            controller.selectedIndex.value == 0 ? HomeScreen() : Container(),
+            controller.selectedIndex.value == 1 ? OverviewScreen() : Container(),
             controller.selectedIndex.value == 2 ? QRScannerScreen() : Container(),
-            controller.selectedIndex.value == 3 ?ChatListScreen():Container(),
-            controller.selectedIndex.value == 4 ?ProfileScreen():Container(),
+            controller.selectedIndex.value == 3 ? ChatListScreen() : Container(),
+            controller.selectedIndex.value == 4 ? ProfileScreen() : Container(),
           ],
         ),
+
+        /// 🟢 Bottom Navigation Bar
         bottomNavigationBar: Container(
-          color: AppColors.primaryColor,
-          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(_navItems.length, (index) {
-              final isSelected = controller.selectedIndex.value == index;
-              return GestureDetector(
-                onTap: () => controller.changeIndex(index),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 6.w),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SvgPicture.asset(
-                        _navItems[index]["icon"]!,
-                        width: 26.w,
-                        height: 26.h,
-                        colorFilter: ColorFilter.mode(
-                          isSelected ? Colors.white : Colors.white54,
-                          BlendMode.srcIn,
-                        ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.r),
+              topRight: Radius.circular(20.r),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 8,
+                offset: Offset(0, -2),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.r),
+              topRight: Radius.circular(20.r),
+            ),
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Colors.white,
+              currentIndex: controller.selectedIndex.value,
+              onTap: controller.changeIndex,
+              selectedItemColor: AppColors.primaryColor,
+              unselectedItemColor: Colors.black,
+              selectedLabelStyle: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13.sp,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 10.sp,
+              ),
+              iconSize: 24,
+              items: List.generate(_navItems.length, (index) {
+                final isSelected = controller.selectedIndex.value == index;
+                return BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: const EdgeInsets.only(top: 8, bottom: 6),
+                    child: SvgPicture.asset(
+                      _navItems[index]["icon"]!,
+                      width: isSelected ? 28.w : 24.w,
+                      height: isSelected ? 28.h : 24.h,
+                      colorFilter: ColorFilter.mode(
+                        isSelected ? AppColors.primaryColor : Colors.black,
+                        BlendMode.srcIn,
                       ),
-                      SizedBox(height: 6.h),
-                      CommonText(
-                        text: _navItems[index]["label"]!,
-                        fontSize: 12.sp,
-                        color: isSelected ? Colors.white : Colors.white70,
-                        fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              );
-            }),
+                  label: _navItems[index]["label"],
+                );
+              }),
+            ),
           ),
         ),
       ),

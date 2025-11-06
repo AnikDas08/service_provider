@@ -40,7 +40,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CommonImage(imageSrc: AppImages.noImage, size: 70).center,
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: CommonImage(imageSrc: "assets/images/flash_image_service.png", height: double.infinity,width: double.infinity,).center,
+      ),
     );
   }
 }
