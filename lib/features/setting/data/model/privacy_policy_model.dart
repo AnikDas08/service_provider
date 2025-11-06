@@ -1,14 +1,14 @@
-class HtmlModel {
+class PrivacyPolicyModel {
   final String id;
   final String content;
 
-  HtmlModel({
+  PrivacyPolicyModel({
     required this.id,
     required this.content,
   });
 
-  factory HtmlModel.fromJson(Map<String, dynamic> json) {
-    return HtmlModel(
+  factory PrivacyPolicyModel.fromJson(Map<String, dynamic> json) {
+    return PrivacyPolicyModel(
       id: json['_id'] ?? '',
       content: json['privacyPolicy'] ?? 'No Data Found',
     );

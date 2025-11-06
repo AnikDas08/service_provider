@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/features/setting/presentation/controller/service_provider_controller.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
@@ -23,14 +24,9 @@ class ServiceProviderPolicy extends StatelessWidget {
                 children: [
                   CustomAppBar(title: AppString.service_provider_policy,),
                   SizedBox(height: 20,),
-                  CommonText(
-                    text: controller.data.content,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    textAlign: TextAlign.start,
-                    maxLines: 50,
-                    color: AppColors.black300,
-                  )
+                  Html(
+                    data: controller.data.content,
+                  ),
                 ],
               ),
             ),

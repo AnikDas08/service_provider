@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/features/setting/presentation/controller/terms_of_services_controller.dart';
-import '../../../../component/text/common_text.dart';
 import '../../../../utils/app_bar/custom_appbars.dart';
-import '../../../../utils/constants/app_colors.dart';
 import '../../../../../utils/constants/app_string.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class TermsOfServicesScreen extends StatelessWidget {
   const TermsOfServicesScreen({super.key});
@@ -21,14 +20,9 @@ class TermsOfServicesScreen extends StatelessWidget {
               children: [
                 CustomAppBar(title: AppString.term_condition_text,),
                 SizedBox(height: 20,),
-                CommonText(
-                  text: controller.data.content,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                  textAlign: TextAlign.start,
-                  maxLines: 50,
-                  color: AppColors.black300,
-                )
+                Html(
+                  data: controller.data.content,
+                ),
               ],
             ),
           ),

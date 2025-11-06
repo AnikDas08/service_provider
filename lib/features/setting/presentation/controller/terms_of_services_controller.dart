@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/features/setting/data/model/tearm_condition_model.dart';
 import '../../data/model/html_model.dart';
 import '../../../../services/api/api_service.dart';
 import '../../../../config/api/api_end_point.dart';
@@ -10,7 +11,7 @@ class TermsOfServicesController extends GetxController {
   Status status = Status.completed;
 
   ///  HTML model initialize here
-  HtmlModel data = HtmlModel.fromJson({});
+  TearmConditionModel data = TearmConditionModel.fromJson({});
 
   /// Terms of services Controller instance create here
   static TermsOfServicesController get instance =>
@@ -24,7 +25,7 @@ class TermsOfServicesController extends GetxController {
     var response = await ApiService.get(ApiEndPoint.termsCondition);
 
     if (response.statusCode == 200) {
-      data = HtmlModel.fromJson(response.data['data']);
+      data = TearmConditionModel.fromJson(response.data['data']);
 
       status = Status.completed;
       update();
