@@ -332,13 +332,13 @@ class HomeScreen extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
-                      "assets/images/item_image.png",
+                      "assets/images/noImage.png",
                       fit: BoxFit.cover,
                     );
                   },
                 )
                     : Image.asset(
-                  "assets/images/item_image.png",
+                  "assets/images/noImage.png",
                   fit: BoxFit.cover,
                 ),
               ),
@@ -419,12 +419,6 @@ class HomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.w400,
                       ),
                       SizedBox(width: 12.w),
-                      CommonText(
-                        text: 'RSD: ${controller.getAmount(booking)}',
-                        fontSize: 12.sp,
-                        color: AppColors.black400,
-                        fontWeight: FontWeight.w500,
-                      ),
                     ],
                   ),
                 ],

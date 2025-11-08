@@ -309,9 +309,55 @@ class EditServiceScreen extends StatelessWidget {
 
               return Column(
                 children: [
+                  // Service header with delete button (not for first service)
+                  if (index > 0)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8.h),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CommonText(
+                            text: "Service ${index + 1}",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.black,
+                            textAlign: TextAlign.start,
+                          ),
+                          GestureDetector(
+                            onTap: () => _showDeleteConfirmationDialog(controller, index),
+                            child: Container(
+                              padding: EdgeInsets.all(6.w),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6.r),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.delete_outline,
+                                    size: 16.sp,
+                                    color: Colors.red,
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  CommonText(
+                                    text: "Delete",
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.red,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                   // Service dropdown
                   _buildFieldWithLabel(
-                    label: index == 0 ? AppString.service_text : "${AppString.service_text} ${index + 1}",
+                    label: index == 0 ? AppString.service_text : "Service",
                     child: _buildDropdownField(
                       controller: controller,
                       textController: pair.serviceController,
@@ -324,7 +370,7 @@ class EditServiceScreen extends StatelessWidget {
 
                   // Service Type dropdown (depends on selected service)
                   _buildFieldWithLabel(
-                    label: index == 0 ? AppString.service_type : "${AppString.service_type} ${index + 1}",
+                    label: index == 0 ? AppString.service_type : "Service Type",
                     child: GetBuilder<EditServiceController>(
                       builder: (controller) => _buildDropdownField(
                         controller: controller,
@@ -341,7 +387,7 @@ class EditServiceScreen extends StatelessWidget {
 
                   // Price field
                   _buildFieldWithLabel(
-                    label: index == 0 ? AppString.price_text : "${AppString.price_text} ${index + 1}",
+                    label: index == 0 ? AppString.price_text : AppString.price_text,
                     child: CommonTextField(
                       controller: pair.priceController,
                       hintText: AppString.price_hints,
@@ -352,40 +398,7 @@ class EditServiceScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // Delete button for services (except first one)
-                  /*if (controller.servicePairs.length > 1 && index > 0)
-                    Padding(
-                      padding: EdgeInsets.only(top: 8.h),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: GestureDetector(
-                          onTap: () => controller.removeService(index),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                            decoration: BoxDecoration(
-                              color: Colors.red[50],
-                              borderRadius: BorderRadius.circular(6.r),
-                              border: Border.all(color: Colors.red[200]!),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.delete_outline, size: 16.sp, color: Colors.red),
-                                SizedBox(width: 4.w),
-                                CommonText(
-                                  text: "Remove Service",
-                                  fontSize: 12.sp,
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w500,
-                                  textAlign: TextAlign.start,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),*/
-
+                  // Divider between services (except for last one)
                   if (index < controller.servicePairs.length - 1)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.h),
@@ -858,7 +871,7 @@ class EditServiceScreen extends StatelessWidget {
           },
           child: Center(
             child: CommonText(
-              text: AppString.confirm_button,
+              text: AppString.submit_approve,
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
               color: AppColors.white,
@@ -942,6 +955,66 @@ class EditServiceScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+  void _showDeleteConfirmationDialog(EditServiceController controller, int index) {
+    // Prevent deleting the first service
+    if (index == 0) {
+      Get.snackbar(
+        "Info",
+        "The first service cannot be deleted",
+        backgroundColor: Colors.orange[100],
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        title: CommonText(
+          text: "Delete Service",
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.black,
+          textAlign: TextAlign.center,
+        ),
+        content: CommonText(
+          text: "Are you sure you want to delete this service?",
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w400,
+          maxLines: 2,
+          color: AppColors.black400,
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: CommonText(
+              text: "Cancel",
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.black400,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              controller.removeService(index);
+            },
+            child: CommonText(
+              text: "Delete",
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: Colors.red,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

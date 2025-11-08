@@ -78,13 +78,13 @@ class ViewDetailsUpcoming extends StatelessWidget {
                             errorBuilder:
                                 (context, error, stackTrace) {
                               return Image.asset(
-                                "assets/images/item_image.png",
+                                "assets/images/noImage.png",
                                 fit: BoxFit.cover,
                               );
                             },
                           )
                               : Image.asset(
-                            "assets/images/item_image.png",
+                            "assets/images/noImage.png",
                             fit: BoxFit.cover,
                           ),
                         ),

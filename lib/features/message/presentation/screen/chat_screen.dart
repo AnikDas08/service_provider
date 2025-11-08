@@ -113,7 +113,7 @@ class ChatListScreen extends StatelessWidget {
                   if (controller.chats.isEmpty) {
                     return Center(
                       child: Text(
-                        "No messages found",
+                        AppString.messageNot,
                         style: GoogleFonts.roboto(
                           fontSize: 14.sp,
                           color: AppColors.black100,
@@ -172,11 +172,16 @@ class ChatListScreen extends StatelessWidget {
                   color: AppColors.black100,
                   shape: BoxShape.circle,
                 ),
-                child: Image.network(
+                child: message.participant.image!=""?Image.network(
                   ApiEndPoint.socketUrl+message.participant.image,
                   width: 50.w,
                   height: 50.w,
                   fit: BoxFit.cover,
+                ):Image.asset(
+                  "assets/images/noImage.png",
+                  height: 50.h,
+                  width: 50.w,
+                  fit:BoxFit.cover
                 )
               ),
             ),

@@ -420,7 +420,7 @@ class OverviewScreen extends StatelessWidget {
                 // Start Time Dropdown
                 Obx(() {
                   String startTimeText = controller.getStartTime(day);
-                  bool isPlaceholder = startTimeText == "Start Time";
+                  bool isPlaceholder = startTimeText == AppString.start_time;
 
                   return GestureDetector(
                     onTap: () {
@@ -437,7 +437,7 @@ class OverviewScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            controller.workingTimes[day]!['start']!.isEmpty ? "Select Start Time" : startTimeText,
+                            controller.workingTimes[day]!['start']!.isEmpty ? AppString.select_start_time : startTimeText,
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: isPlaceholder ? Colors.grey[500]! : Colors.black87,
@@ -455,7 +455,7 @@ class OverviewScreen extends StatelessWidget {
                 // End Time Dropdown
                 Obx(() {
                   String endTimeText = controller.getEndTime(day);
-                  bool isPlaceholder = endTimeText == "End Time";
+                  bool isPlaceholder = endTimeText == AppString.end_time;
 
                   return GestureDetector(
                     onTap: () {
@@ -472,7 +472,7 @@ class OverviewScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            controller.workingTimes[day]!['end']!.isEmpty ? "Select End Time" : endTimeText,
+                            controller.workingTimes[day]!['end']!.isEmpty ? AppString.select_end_time : endTimeText,
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: isPlaceholder ? Colors.grey[500]! : Colors.black87,

@@ -93,7 +93,7 @@ class AppString {
       "\"We’ve Sent A One-Time Password (OTP) To Your Email. Please Enter It Below To Continue.\"";
 
   /// On boarding text
-  static const String onboarding_text = "TvojeVreme\nPartner";
+  static const String onboarding_text = "Velodora ";
 
   /// Login text
   static const String login_text = "Log In";
@@ -119,6 +119,7 @@ class AppString {
   static const String save_button_text = "Save";
   static const String password_hint = "Enter Password";
   static const String already_have_account_chair = "Already Have an Account?";
+  static const String start_conversation_here = "No messages yet\nStart a conversation!";
 
   /// Forget Password
   static const String forget_password_text="Forgot Password";
@@ -139,9 +140,11 @@ class AppString {
   static const String hint_new_password="Enter New Password";
   static const String hint_confirm_password="Enter Confirm Password";
   static const String confirm_button="Confirm";
+  static const String submit_approve="Submit for Approval";
   static const String password_change_now="Your Password Has Been\nChanged";
   static const String favourite="Favorite";
   static const String favouriteScreen="Favorite Screen";
+  static const String messageNot="No messages found";
 
 
   /// Complete Profile
@@ -213,6 +216,10 @@ class AppString {
   static const String cancel_booking="Canceled Booking";
   static const String total_amount="Total  Money Earned";
   static const String months="All Months";
+  static const String start_time="Start Time";
+  static const String select_start_time="Select Start Time";
+  static const String end_time="End Time";
+  static const String select_end_time="Select End Time";
 
 
   ///
@@ -239,8 +246,6 @@ class AppString {
   static const String october_text="October";
   static const String november_text="November";
   static const String december_text="December";
-  static const String start_time="Select Start Time";
-  static const String end_time="Select End Time";
   static const String submit_button="Submit";
   static const String submit_for_button="Submit for Approval";
 

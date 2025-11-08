@@ -167,9 +167,55 @@ class CompleteProfileScreen extends StatelessWidget {
 
               return Column(
                 children: [
+                  // Service header with delete button (not for first service)
+                  if (index > 0)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8.h),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CommonText(
+                            text: "Service ${index + 1}",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.black,
+                            textAlign: TextAlign.start,
+                          ),
+                          GestureDetector(
+                            onTap: () => _showDeleteConfirmationDialog(controller, index),
+                            child: Container(
+                              padding: EdgeInsets.all(6.w),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6.r),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.delete_outline,
+                                    size: 16.sp,
+                                    color: Colors.red,
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  CommonText(
+                                    text: "Delete",
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.red,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                   // Category dropdown
                   _buildFieldWithLabel(
-                    label: index == 0 ? "Service " : "Service ${index + 1}",
+                    label: index == 0 ? "Service " : "Service",
                     child: Obx(() => _buildDropdownFieldWithCallback(
                       controller: controller,
                       textController: pair.serviceController,
@@ -194,7 +240,7 @@ class CompleteProfileScreen extends StatelessWidget {
 
                   // SubCategory dropdown (depends on selected category)
                   _buildFieldWithLabel(
-                    label: index == 0 ? "Service Type" : "Service Type ${index + 1}",
+                    label: index == 0 ? "Service Type" : "Service Type",
                     child: GetBuilder<CompleteProfileController>(
                       builder: (controller) {
                         final subCategories = pair.selectedCategoryId != null
@@ -227,7 +273,7 @@ class CompleteProfileScreen extends StatelessWidget {
 
                   // Price field for each service
                   _buildFieldWithLabel(
-                    label: index == 0 ? AppString.price_text : "${AppString.price_text} ${index + 1}",
+                    label: index == 0 ? AppString.price_text : AppString.price_text,
                     child: CommonTextField(
                       controller: pair.priceController,
                       hintText: AppString.price_hints,
@@ -238,7 +284,15 @@ class CompleteProfileScreen extends StatelessWidget {
                     ),
                   ),
 
-                  if (index < controller.servicePairs.length - 1) SizedBox(height: 16.h),
+                  // Divider between services (except for last one)
+                  if (index < controller.servicePairs.length - 1)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: Divider(
+                        color: AppColors.black50,
+                        thickness: 1,
+                      ),
+                    ),
                 ],
               );
             }),
@@ -1308,6 +1362,16 @@ class CompleteProfileScreen extends StatelessWidget {
 
 // Add this method for delete confirmation dialog
   void _showDeleteConfirmationDialog(CompleteProfileController controller, int index) {
+    // Prevent deleting the first service
+    if (index == 0) {
+      Get.snackbar(
+        "Info",
+        "The first service cannot be deleted",
+        backgroundColor: Colors.orange[100],
+      );
+      return;
+    }
+
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(
@@ -1325,6 +1389,7 @@ class CompleteProfileScreen extends StatelessWidget {
           fontSize: 14.sp,
           fontWeight: FontWeight.w400,
           color: AppColors.black400,
+          maxLines: 2,
           textAlign: TextAlign.center,
         ),
         actions: [
