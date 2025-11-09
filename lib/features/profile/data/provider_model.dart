@@ -7,7 +7,7 @@ class ProviderData {
   List<String>? serviceLanguage;
   String? primaryLocation;
   Location? location;
-  int? serviceDistance;
+  num? serviceDistance;
   double? pricePerHour;
   List<String>? serviceImages;
   bool? isRead;
@@ -90,7 +90,7 @@ class ProviderData {
     List<String>? serviceLanguage,
     String? primaryLocation,
     Location? location,
-    int? serviceDistance,
+    num? serviceDistance,
     double? pricePerHour,
     List<String>? serviceImages,
     bool? isRead,

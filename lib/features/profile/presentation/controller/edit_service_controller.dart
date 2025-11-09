@@ -43,7 +43,7 @@ class EditServiceController extends GetxController {
   final TextEditingController pricePerHourController = TextEditingController();
 
   // Observable variables
-  RxDouble serviceDistance = 0.0.obs;
+  RxNum serviceDistance = RxNum(0);
   RxBool isPrivacyAccepted = false.obs;
   RxList<String> uploadedImages = <String>[].obs;
   Rx<File?> profileImage = Rx<File?>(null);
@@ -551,7 +551,7 @@ class EditServiceController extends GetxController {
           "type": "Point",
           "coordinates": [longitude, latitude]
         },
-        "serviceDistance": serviceDistance.value.toInt(),
+        "serviceDistance": serviceDistance.value,
         "pricePerHour": (double.tryParse(pricePerHourController.text.trim()) ?? 0).toInt(),
         "isRead": true,
       };

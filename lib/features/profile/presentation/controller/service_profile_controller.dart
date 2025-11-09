@@ -10,7 +10,7 @@ class ServiceProfileController extends GetxController {
   RxString aboutMe = ''.obs;
   RxList<String> serviceLanguages = <String>[].obs;
   RxString primaryLocation = ''.obs;
-  RxInt serviceDistance = 0.obs;
+  RxNum serviceDistance = RxNum(0);
   RxDouble pricePerHour = 0.0.obs;
   RxList<String> workPhotos = <String>[].obs;
   RxBool isLoading = true.obs;
@@ -140,7 +140,7 @@ class ServiceProfileController extends GetxController {
   // Get formatted service distance
   String getFormattedServiceDistance() {
     if (serviceDistance.value == 0) return 'Not specified';
-    return '${serviceDistance.value} KM';
+    return '${serviceDistance.value.toStringAsFixed(2)} KM';
   }
 
   void editServiceDetails() {

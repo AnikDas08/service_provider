@@ -751,7 +751,7 @@ class EditServiceScreen extends StatelessWidget {
               overlayColor: AppColors.primaryColor.withOpacity(0.2),
             ),
             child: Slider(
-              value: controller.serviceDistance.value,
+              value: controller.serviceDistance.value.toDouble(),
               min: 0,
               max: 100,
               divisions: 100,

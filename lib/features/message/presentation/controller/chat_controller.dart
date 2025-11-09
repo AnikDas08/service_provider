@@ -58,8 +58,21 @@ class ChatControllers extends GetxController {
 
       for (var item in data) {
         chats.add(ChatModel.fromJson(item));
-        name = item['participant']['name'];
-        image = item['participant']['image'];
+
+        // ✅ participants is List, so access using index
+        final participants = item['participants'];
+        if (participants is List && participants.isNotEmpty) {
+          final user = participants[0];  // first participant
+          name = user['name'] ?? "";
+          image = user['image'] ?? "";
+        }
+
+        // ✅ if you need last message safely
+        final lastMessage = item['lastMessage'];
+        if (lastMessage is Map && lastMessage['sender'] is Map) {
+          var sender = lastMessage['sender'];
+          print("Last sender name: ${sender['name']}");
+        }
       }
 
       page = page + 1;
@@ -91,6 +104,7 @@ class ChatControllers extends GetxController {
   @override
   void onInit() {
     getChatRepo();
+    listenChat();
     super.onInit();
   }
 }

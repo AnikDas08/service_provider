@@ -115,14 +115,20 @@ class ProfileController extends GetxController {
 
   Future<void> getRating()async{
     try {
-      final token = AppAuthStorage().getValue(StorageKey.token);
+      final token = await AppAuthStorage().getValue(StorageKey.token);
       final response = await ApiService.get(
         ApiEndPoint.review,
         header: {"Authorization": "Bearer ${LocalStorage.token}"},
       );
       if (response.statusCode == 200) {
-        rating.value = response.data["data"]["averageRating"]??0.0;
-        review.value = response.data["data"]["totalReviews"]??0;
+        //print("rating 😍😍😍😍 "+rating.value.toString());
+        var avg = response.data["data"]["averageRating"];
+        var total = response.data["data"]["totalReviews"];
+
+        rating.value = (avg ?? 0).toDouble();  // ✅ null safe + convert to double
+        review.value = (total ?? 0);
+
+        print("rating 😍😍😍😍 ${rating.value}"); // ✅ will print now
         update();
       } else {
         Get.snackbar("Error", response.message);
