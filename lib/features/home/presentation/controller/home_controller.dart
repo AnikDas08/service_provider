@@ -148,7 +148,7 @@ class HomeController extends GetxController {
 
       final response = await ApiService.get('booking?status=$status&page=$page$dateParam');
 
-      if (response.statusCode == 200 && response.data != null) {
+      if (response.statusCode == 200) {
         final List<dynamic> bookingsData = response.data['data'] ?? [];
 
         // Update pagination info

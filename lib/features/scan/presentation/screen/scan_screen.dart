@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/component/text/common_text.dart';
-import 'package:haircutmen_user_app/features/scan/presentation/widgets/confirm_dialog.dart';
 import 'package:haircutmen_user_app/utils/constants/app_colors.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 

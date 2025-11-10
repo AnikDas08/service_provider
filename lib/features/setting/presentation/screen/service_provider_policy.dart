@@ -3,8 +3,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/features/setting/presentation/controller/service_provider_controller.dart';
 import 'package:haircutmen_user_app/utils/app_bar/custom_appbars.dart';
-import 'package:haircutmen_user_app/utils/constants/app_colors.dart';
-import '../../../../component/text/common_text.dart';
 import '../../../../utils/constants/app_string.dart';
 
 class ServiceProviderPolicy extends StatelessWidget {

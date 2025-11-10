@@ -347,7 +347,7 @@ class OverviewScreen extends StatelessWidget {
                     onChanged: (val) {
                       controller.toggleDay(day, val);
                     },
-                    activeColor: AppColors.primaryColor,
+                    activeThumbColor: AppColors.primaryColor,
                     activeTrackColor: AppColors.red100,
                     inactiveThumbColor: AppColors.gray,
                     trackOutlineColor: WidgetStateProperty.all(Colors.transparent),

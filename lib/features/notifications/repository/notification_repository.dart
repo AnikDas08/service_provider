@@ -12,7 +12,7 @@ Future<List<NotificationModel>> notificationRepository(int page) async {
       },
     );
 
-    if (response.statusCode == 200 && response.data != null) {
+    if (response.statusCode == 200) {
       // Try to extract the list from different possible keys
       dynamic rawData = response.data;
       List dataList = [];

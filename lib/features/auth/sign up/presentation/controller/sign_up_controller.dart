@@ -71,7 +71,7 @@ class SignUpController extends GetxController {
   onCountryChange(Country value) {
     update();
     countryCode = value.dialCode.toString();
-    print("😍😍😍😍 ${countryCode}");
+    print("😍😍😍😍 $countryCode");
     update();
   }
 
@@ -84,7 +84,7 @@ class SignUpController extends GetxController {
   signUpUser() async {
     if (!signUpFormKey.currentState!.validate()) return;
     //Get.toNamed(AppRoutes.verifyUser);
-    print("Country code 😍😍😍😍 ${countryCode}");
+    print("Country code 😍😍😍😍 $countryCode");
     isLoading = true;
     update();
     Map<String, String> body = {

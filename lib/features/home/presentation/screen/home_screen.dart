@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
                           Switch(
                             value: controller.isOnline,
                             onChanged: (val) => controller.onlineStatus(),
-                            activeColor: AppColors.primaryColor,
+                            activeThumbColor: AppColors.primaryColor,
                             activeTrackColor: AppColors.primaryColor.withOpacity(0.3),
                             inactiveThumbColor: Colors.grey[400],
                             inactiveTrackColor: Colors.grey[300],

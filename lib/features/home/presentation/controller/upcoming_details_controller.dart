@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import 'package:haircutmen_user_app/config/route/app_routes.dart';
-import 'package:haircutmen_user_app/features/home/presentation/controller/home_controller.dart';
 import '../../../../services/api/api_service.dart';
 
 class UpcomingViewDetailsController extends GetxController {
@@ -72,7 +70,7 @@ class UpcomingViewDetailsController extends GetxController {
       userLocation = bookingData['user']['location'] ?? 'Location';
     }
 
-    print("user name : 😍😍😍😍${userName}");
+    print("user name : 😍😍😍😍$userName");
 
     // Service name from category
     if (bookingData['services'] != null && bookingData['services'] is List) {

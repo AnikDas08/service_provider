@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/features/notifications/data/model/notification_model.dart';
 import 'package:haircutmen_user_app/features/notifications/repository/notification_repository.dart';
-import 'package:haircutmen_user_app/features/scan/presentation/widgets/review_scan_bottomsheet.dart';
-import '../../../../config/api/api_end_point.dart';
 import '../../../../services/api/api_service.dart';
 
 class NotificationsController extends GetxController {

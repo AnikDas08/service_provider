@@ -9,7 +9,6 @@ import 'package:haircutmen_user_app/utils/helpers/other_helper.dart';
 import '../../../../config/api/api_end_point.dart';
 import '../../../../config/route/app_routes.dart';
 import '../../../../services/api/api_service.dart';
-import '../../../../services/storage/storage_keys.dart';
 import '../../../../utils/app_utils.dart';
 
 class ProfileController extends GetxController {
@@ -99,7 +98,7 @@ class ProfileController extends GetxController {
         images.value = response.data["data"]["user"]["image"] ?? "";
         category.value = response.data["data"]["services"]?[0]?["category"]?["name"] ?? "";
         countrCode.value = response.data["data"]["user"]["countryCode"];
-        fullNumber.value = countrCode.value +" "+ phone.value;
+        fullNumber.value = "${countrCode.value} ${phone.value}";
 
         update();
       } else {
@@ -115,7 +114,7 @@ class ProfileController extends GetxController {
 
   Future<void> getRating()async{
     try {
-      final token = await AppAuthStorage().getValue(StorageKey.token);
+      final token = AppAuthStorage().getValue(StorageKey.token);
       final response = await ApiService.get(
         ApiEndPoint.review,
         header: {"Authorization": "Bearer ${LocalStorage.token}"},
