@@ -60,8 +60,9 @@ class EditServiceController extends GetxController {
   RxList<Category> categories = <Category>[].obs;
   RxMap<String, List<SubCategory>> subCategoriesMap = <String, List<SubCategory>>{}.obs;
 
-  double latitude = 0.0;
-  double longitude = 0.0;
+  // Default coordinates (Dhaka, Bangladesh)
+  double latitude = 23.8103;
+  double longitude = 90.4125;
 
   // Asset images (can be modified/removed)
   RxList<String> assetImages = <String>[].obs;
@@ -138,7 +139,8 @@ class EditServiceController extends GetxController {
   void onInit() {
     super.onInit();
     getProviderInformation();
-    requestPermissionsAndFetchLocation();
+    // Optional: Fetch location in background without blocking
+    getCurrentLocation();
   }
 
   @override
@@ -164,36 +166,29 @@ class EditServiceController extends GetxController {
     return assetImages.length + uploadedImages.length;
   }
 
-  Future<void> requestPermissionsAndFetchLocation() async {
-    await _requestLocationPermission();
-    await getCurrentLocation();
-  }
-
-  Future<void> _requestLocationPermission() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      Get.snackbar("Error", "Location services are disabled");
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        Get.snackbar("Error", "Location permission denied");
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      Get.snackbar("Error",
-          "Location permissions are permanently denied, cannot fetch location.");
-      return;
-    }
-  }
-
+  // Optional: Get current location in background (non-blocking)
   Future<void> getCurrentLocation() async {
     try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print("Location services are disabled");
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          print("Location permission denied");
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        print("Location permissions are permanently denied");
+        return;
+      }
+
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
 
@@ -201,11 +196,10 @@ class EditServiceController extends GetxController {
       longitude = position.longitude;
 
       print("Location fetched - Lat: $latitude, Long: $longitude");
-      // Don't update locationController here - let user type their own location
       update();
     } catch (e) {
-      Get.snackbar("Error", "Failed to get location: $e",
-          backgroundColor: Colors.red[100]);
+      print("Failed to get location: $e (using default coordinates)");
+      // Keep using default coordinates
     }
   }
 
@@ -641,7 +635,7 @@ class EditServiceController extends GetxController {
         } else if (data['message'] != null) {
           errorMessage = data['message'].toString();
         }
-      
+
         Utils.errorSnackBar(0, errorMessage);
       }
     } catch (e) {

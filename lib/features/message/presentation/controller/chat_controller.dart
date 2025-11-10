@@ -11,15 +11,11 @@ import '../../../../utils/enum/enum.dart';
 class ChatControllers extends GetxController {
   /// Api status check here
   Status status = Status.completed;
-
   /// Chat more Data Loading Bar
   bool isMoreLoading = false;
-
   TextEditingController searchController = TextEditingController();
-
   /// page no here
   int page = 1;
-
   /// Chat List here
   List chats = [];
 
@@ -50,15 +46,11 @@ class ChatControllers extends GetxController {
       status = Status.loading;
       update();
     }
-
     var response = await ApiService.get("${ApiEndPoint.chats}?page=$page");
-
     if (response.statusCode == 200) {
       var data = response.data['data'] ?? [];
-
       for (var item in data) {
         chats.add(ChatModel.fromJson(item));
-
         // ✅ participants is List, so access using index
         final participants = item['participants'];
         if (participants is List && participants.isNotEmpty) {
@@ -66,7 +58,6 @@ class ChatControllers extends GetxController {
           name = user['name'] ?? "";
           image = user['image'] ?? "";
         }
-
         // ✅ if you need last message safely
         final lastMessage = item['lastMessage'];
         if (lastMessage is Map && lastMessage['sender'] is Map) {
@@ -74,7 +65,6 @@ class ChatControllers extends GetxController {
           print("Last sender name: ${sender['name']}");
         }
       }
-
       page = page + 1;
       status = Status.completed;
       update();
@@ -90,11 +80,9 @@ class ChatControllers extends GetxController {
     SocketServices.on("update-chatlist::${LocalStorage.userId}", (data) {
       page = 1;
       chats.clear();
-
       for (var item in data) {
         chats.add(ChatModel.fromJson(item));
       }
-
       status = Status.completed;
       update();
     });

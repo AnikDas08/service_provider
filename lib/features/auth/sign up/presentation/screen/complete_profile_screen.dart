@@ -1060,7 +1060,7 @@ class CompleteProfileScreen extends StatelessWidget {
               color: Colors.white,
             )
                 : CommonText(
-              text: AppString.confirm_button,
+              text: AppString.submit_for_button,
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
               color: AppColors.white,
