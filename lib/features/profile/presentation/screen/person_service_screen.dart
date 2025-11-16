@@ -20,218 +20,221 @@ class ServiceProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: AppColors.primaryColor,
-            ),
-          );
-        }
-
-        return SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomAppBar(
-                    title: AppString.service_information,
-                  ),
-                  SizedBox(height: 18.h),
-
-                  // About Me Section
-                  CommonText(
-                    text: AppString.about_me,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.black400,
-                    textAlign: TextAlign.left,
-                  ),
-                  SizedBox(height: 12.h),
-                  Obx(() => CommonText(
-                    text: controller.aboutMe.value.isEmpty
-                        ? AppString.noinformation
-                        : controller.aboutMe.value,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.black300,
-                    textAlign: TextAlign.left,
-                    maxLines: 10,
-                  )),
-
-                  SizedBox(height: 14.h),
-
-                  // Languages
-                  Obx(() => Row(
-                    children: [
-                      CommonText(
-                        text: AppString.spoken,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.black400,
-                        textAlign: TextAlign.left,
-                      ),
-                      Expanded(
-                        child: CommonText(
-                          text: controller.getLanguagesString(),
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Obx(() {
+            if (controller.isLoading.value) {
+              return Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.primaryColor,
+                ),
+              );
+            }
+        
+            return SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomAppBar(
+                      title: AppString.service_information,
+                    ),
+                    SizedBox(height: 18.h),
+        
+                    // About Me Section
+                    CommonText(
+                      text: AppString.about_me,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.black400,
+                      textAlign: TextAlign.left,
+                    ),
+                    SizedBox(height: 12.h),
+                    Obx(() => CommonText(
+                      text: controller.aboutMe.value.isEmpty
+                          ? AppString.noinformation
+                          : controller.aboutMe.value,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.black300,
+                      textAlign: TextAlign.left,
+                      maxLines: 10,
+                    )),
+        
+                    SizedBox(height: 14.h),
+        
+                    // Languages
+                    Obx(() => Row(
+                      children: [
+                        CommonText(
+                          text: AppString.spoken,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.black400,
+                          textAlign: TextAlign.left,
+                        ),
+                        Expanded(
+                          child: CommonText(
+                            text: controller.getLanguagesString(),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryColor,
+                            textAlign: TextAlign.left,
+                            maxLines: 2,
+                          ),
+                        ),
+                      ],
+                    )),
+        
+                    SizedBox(height: 10.h),
+        
+                    // Location
+                    Obx(() => Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/location_icon.svg",
+                          width: 24.w,
+                          height: 24.h,
+                          color: AppColors.black400,
+                        ),
+                        SizedBox(width: 4.w),
+                        CommonText(
+                          text: controller.primaryLocation.value.isEmpty
+                              ? AppString.nolocation
+                              : controller.primaryLocation.value,
+                          fontSize: 16.sp,
+                          color: AppColors.black300,
+                          fontWeight: FontWeight.w400,
+                          maxLines: 2,
+                        ),
+                      ],
+                    )),
+        
+                    SizedBox(height: 10.h),
+        
+                    // Service Distance
+                    Obx(() => Row(
+                      children: [
+                        CommonText(
+                          text: AppString.serviceDistance,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.black400,
+                          textAlign: TextAlign.left,
+                        ),
+                        CommonText(
+                          text: controller.getFormattedServiceDistance(),
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: AppColors.primaryColor,
                           textAlign: TextAlign.left,
-                          maxLines: 2,
+                        ),
+                      ],
+                    )),
+        
+                    SizedBox(height: 10.h),
+        
+                    // Price Per Hour
+                    Obx(() => Row(
+                      children: [
+                        CommonText(
+                          text: AppString.priceperHour,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.black400,
+                          textAlign: TextAlign.left,
+                        ),
+                        CommonText(
+                          text: controller.getFormattedPricePerHour(),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryColor,
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
+                    )),
+        
+                    SizedBox(height: 20.h),
+        
+                    // Services Table
+                    Obx(() => controller.services.isEmpty
+                        ? Container(
+                      padding: EdgeInsets.all(20.w),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: AppColors.black300.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Center(
+                        child: CommonText(
+                          text: AppString.service_available,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.black300,
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ],
-                  )),
-
-                  SizedBox(height: 10.h),
-
-                  // Location
-                  Obx(() => Row(
-                    children: [
-                      SvgPicture.asset(
-                        "assets/icons/location_icon.svg",
-                        width: 24.w,
-                        height: 24.h,
-                        color: AppColors.black400,
-                      ),
-                      SizedBox(width: 4.w),
-                      CommonText(
-                        text: controller.primaryLocation.value.isEmpty
-                            ? AppString.nolocation
-                            : controller.primaryLocation.value,
-                        fontSize: 16.sp,
-                        color: AppColors.black300,
-                        fontWeight: FontWeight.w400,
-                        maxLines: 2,
-                      ),
-                    ],
-                  )),
-
-                  SizedBox(height: 10.h),
-
-                  // Service Distance
-                  Obx(() => Row(
-                    children: [
-                      CommonText(
-                        text: AppString.serviceDistance,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.black400,
-                        textAlign: TextAlign.left,
-                      ),
-                      CommonText(
-                        text: controller.getFormattedServiceDistance(),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                        textAlign: TextAlign.left,
-                      ),
-                    ],
-                  )),
-
-                  SizedBox(height: 10.h),
-
-                  // Price Per Hour
-                  Obx(() => Row(
-                    children: [
-                      CommonText(
-                        text: AppString.priceperHour,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.black400,
-                        textAlign: TextAlign.left,
-                      ),
-                      CommonText(
-                        text: controller.getFormattedPricePerHour(),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                        textAlign: TextAlign.left,
-                      ),
-                    ],
-                  )),
-
-                  SizedBox(height: 20.h),
-
-                  // Services Table
-                  Obx(() => controller.services.isEmpty
-                      ? Container(
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: AppColors.black300.withOpacity(0.3)),
-                      borderRadius: BorderRadius.circular(8.r),
+                    )
+                        : _buildServicesTable()),
+        
+                    SizedBox(height: 14.h),
+        
+                    // My Work Photos Section
+                    const CommonText(
+                      text: AppString.work_details,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.black400,
+                      textAlign: TextAlign.left,
                     ),
-                    child: Center(
-                      child: CommonText(
-                        text: AppString.service_available,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black300,
-                        textAlign: TextAlign.center,
+                    SizedBox(height: 6.h),
+        
+                    // Photo Grid
+                    Obx(() => controller.workPhotos.isEmpty
+                        ? Container(
+                      height: 150.h,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: AppColors.black300.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
-                    ),
-                  )
-                      : _buildServicesTable()),
-
-                  SizedBox(height: 14.h),
-
-                  // My Work Photos Section
-                  const CommonText(
-                    text: AppString.work_details,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.black400,
-                    textAlign: TextAlign.left,
-                  ),
-                  SizedBox(height: 6.h),
-
-                  // Photo Grid
-                  Obx(() => controller.workPhotos.isEmpty
-                      ? Container(
-                    height: 150.h,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: AppColors.black300.withOpacity(0.3)),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Center(
-                      child: CommonText(
-                        text: AppString.workPhotNo,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black300,
-                        textAlign: TextAlign.center,
+                      child: Center(
+                        child: CommonText(
+                          text: AppString.workPhotNo,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.black300,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                  )
-                      : _buildPhotoGrid()),
-
-                  SizedBox(height: 40.h),
-                ],
+                    )
+                        : _buildPhotoGrid()),
+        
+                    SizedBox(height: 40.h),
+                  ],
+                ),
               ),
-            ),
+            );
+          }),
+        
+          // Edit Service Details Button
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
+            child: SizedBox(
+                width: double.infinity,
+                height: 48.h,
+                child: CustomButton(
+                    text: AppString.edit_service_button,
+                    isSelected: true,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.edit_service_screen);
+                    })),
           ),
-        );
-      }),
-
-      // Edit Service Details Button
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
-        child: SizedBox(
-            width: double.infinity,
-            height: 48.h,
-            child: CustomButton(
-                text: AppString.edit_service_button,
-                isSelected: true,
-                onTap: () {
-                  Get.toNamed(AppRoutes.edit_service_screen);
-                })),
+        ),
       ),
     );
   }

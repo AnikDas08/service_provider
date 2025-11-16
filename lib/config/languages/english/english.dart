@@ -213,7 +213,6 @@ Map<String, String> english = {
   AppString.personal_information: "Personal Information",
   AppString.service_information: "My Service",
   AppString.language: "Language",
-  AppString.setting: "Setting",
   AppString.contact_support: "Contact and Support",
   AppString.full_name: "Full Name",
   AppString.contact: "Contact",

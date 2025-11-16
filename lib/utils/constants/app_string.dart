@@ -259,7 +259,7 @@ class AppString {
   static const String personal_information="Personal Information";
   static const String service_information="My Service";
   static const String language="Language";
-  static const String setting="Setting";
+  static const String setting = "Settings";
   static const String contact_support="Contact and Support";
   static const String full_name="Full Name";
   static const String contact="Contact";

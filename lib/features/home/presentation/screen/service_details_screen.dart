@@ -31,7 +31,6 @@ class ServiceDetailsScreen extends StatelessWidget {
                     children: [
                       // Header with image and back button
                       _buildHeader(controller),
-
                       // Content
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20.w),
