@@ -139,7 +139,7 @@ class ServiceProfileScreen extends StatelessWidget {
                     SizedBox(height: 10.h),
         
                     // Price Per Hour
-                    Obx(() => Row(
+                    /*Obx(() => Row(
                       children: [
                         CommonText(
                           text: AppString.priceperHour,
@@ -156,7 +156,7 @@ class ServiceProfileScreen extends StatelessWidget {
                           textAlign: TextAlign.left,
                         ),
                       ],
-                    )),
+                    )),*/
         
                     SizedBox(height: 20.h),
         

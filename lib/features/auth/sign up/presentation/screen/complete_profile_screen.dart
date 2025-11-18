@@ -438,17 +438,17 @@ class CompleteProfileScreen extends StatelessWidget {
         SizedBox(height: 16.h),
 
         // Price Per Hour
-        _buildFieldWithLabel(
-          label: AppString.price_hours,
-          child: CommonTextField(
-            controller: controller.pricePerHourController,
-            hintText: AppString.price_hints,
-            keyboardType: TextInputType.number,
-            borderColor: AppColors.black50,
-            height: 44,
-            textAlign: TextAlign.start,
-          ),
-        ),
+        // _buildFieldWithLabel(
+        //   label: AppString.price_hours,
+        //   child: CommonTextField(
+        //     controller: controller.pricePerHourController,
+        //     hintText: AppString.price_hints,
+        //     keyboardType: TextInputType.number,
+        //     borderColor: AppColors.black50,
+        //     height: 44,
+        //     textAlign: TextAlign.start,
+        //   ),
+        // ),
       ],
     );
   }

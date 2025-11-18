@@ -543,7 +543,7 @@ class EditServiceScreen extends StatelessWidget {
 
         SizedBox(height: 16.h),
 
-        // Price Per Hour
+       /* // Price Per Hour
         _buildFieldWithLabel(
           label: AppString.price_hours,
           child: CommonTextField(
@@ -554,7 +554,7 @@ class EditServiceScreen extends StatelessWidget {
             height: 44,
             textAlign: TextAlign.start,
           ),
-        ),
+        ),*/
       ],
     );
   }

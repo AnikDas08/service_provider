@@ -137,11 +137,12 @@ class HomeController extends GetxController {
   // Fetch bookings by status with pagination
   Future<void> fetchBookingsByStatus(String status, {int page = 1}) async {
     try {
-      // Format selected date for API
       String dateParam = '';
-      if (selectedDay != null) {
+
+      // Only apply date filter for Upcoming bookings
+      // Pending and Canceled will fetch ALL data without date filtering
+      if (status == 'Upcoming' && selectedDay != null) {
         DateTime date = selectedDay!;
-        // Convert to UTC and format as ISO string
         String formattedDate = DateTime.utc(date.year, date.month, date.day).toIso8601String();
         dateParam = '&date=$formattedDate';
       }
@@ -192,15 +193,16 @@ class HomeController extends GetxController {
       print('User is now offline');
     }
   }
-  Future<void> onlineStatus()async{
-    final response=await ApiService.patch(
-      'provider/online-offline-provider',
-      header: {
-        "Authorization": "Bearer ${LocalStorage.token}"
-      }
+
+  Future<void> onlineStatus() async {
+    final response = await ApiService.patch(
+        'provider/online-offline-provider',
+        header: {
+          "Authorization": "Bearer ${LocalStorage.token}"
+        }
     );
-    if(response.statusCode==200){
-      isOnline=response.data['data']['isOnline'];
+    if (response.statusCode == 200) {
+      isOnline = response.data['data']['isOnline'];
       update();
     }
   }
@@ -214,6 +216,9 @@ class HomeController extends GetxController {
     if (scrollController.hasClients) {
       scrollController.jumpTo(0);
     }
+
+    // Refresh bookings when changing filter
+    fetchAllBookings();
   }
 
   // Get status string from filter index
@@ -262,8 +267,11 @@ class HomeController extends GetxController {
 
     print('Selected date: ${selectedDate.toIso8601String()}');
 
-    // Fetch bookings for the selected date
-    fetchAllBookings();
+    // Only refetch if on Upcoming tab (where date filter applies)
+    // For Pending and Canceled, just update the selected date visually
+    if (selectedFilter == 0) {
+      fetchAllBookings();
+    }
   }
 
   // Calendar page changed
@@ -477,6 +485,7 @@ class HomeController extends GetxController {
       Utils.errorSnackBar(0, e.toString());
     }
   }
+
   Future<void> getOnlineStatus() async {
     try {
       final response = await ApiService.get(
@@ -484,7 +493,7 @@ class HomeController extends GetxController {
           header: {"Authorization": "Bearer ${LocalStorage.token}"}
       );
       if (response.statusCode == 200) {
-        isOnline=response.data['data']['isOnline']??false;
+        isOnline = response.data['data']['isOnline'] ?? false;
 
         update();
       } else {
