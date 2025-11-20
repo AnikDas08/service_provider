@@ -56,9 +56,10 @@ class EditServiceController extends GetxController {
   RxList<ServicePair> servicePairs = <ServicePair>[].obs;
   RxList<String> selectedLanguages = <String>[].obs;
 
-  // Dynamic categories and subcategories
-  RxList<Category> categories = <Category>[].obs;
-  RxMap<String, List<SubCategory>> subCategoriesMap = <String, List<SubCategory>>{}.obs;
+  // API Data - Changed to use Map format like complete profile controller
+  var categories = <Map<String, dynamic>>[].obs;
+  var subCategoriesMap = <String, List<Map<String, dynamic>>>{}.obs;
+  var isLoadingSubCategories = <String, bool>{}.obs;
 
   // Default coordinates (Dhaka, Bangladesh)
   double latitude = 23.8103;
@@ -70,32 +71,36 @@ class EditServiceController extends GetxController {
   // Image picker instance
   final ImagePicker _picker = ImagePicker();
 
-  // Static data
-  final Map<String, List<String>> serviceWithTypes = {
-    'Hair Cut': ['Classic Cut', 'Fade Cut', 'Buzz Cut', 'Crew Cut', 'Undercut'],
-    'Beard Trim': ['Full Beard Trim', 'Goatee Trim', 'Mustache Trim', 'Beard Shaping'],
-    'Hair Styling': ['Blow Dry', 'Hair Gel Styling', 'Pomade Styling', 'Wax Styling'],
-    'Hair Wash': ['Basic Wash', 'Deep Cleansing', 'Scalp Treatment'],
-    'Facial': ['Basic Facial', 'Deep Cleansing Facial', 'Anti-Aging Facial'],
-    'Massage': ['Head Massage', 'Neck Massage', 'Shoulder Massage']
-  };
-
+  // Get service names from categories
   List<String> get serviceNames {
     if (categories.isNotEmpty) {
-      return categories.map((cat) => cat.name ?? '').where((name) => name.isNotEmpty).toList();
+      return categories
+          .map((cat) => cat['name']?.toString() ?? '')
+          .where((name) => name.isNotEmpty)
+          .toList();
     }
-    return serviceWithTypes.keys.toList();
+    return [];
   }
 
-  List<String> getServiceTypes(String service) {
-    final category = categories.firstWhereOrNull((cat) => cat.name == service);
-    if (category != null && category.id != null) {
-      final subCategories = subCategoriesMap[category.id!] ?? [];
-      if (subCategories.isNotEmpty) {
-        return subCategories.map((sub) => sub.name ?? '').where((name) => name.isNotEmpty).toList();
+  // Get service types for a specific service
+  List<String> getServiceTypes(String serviceName) {
+    // Find the category
+    final category = categories.firstWhereOrNull(
+          (cat) => cat['name'] == serviceName,
+    );
+
+    if (category != null) {
+      String categoryId = category['_id'] ?? category['id'] ?? '';
+      if (categoryId.isNotEmpty) {
+        final subCategories = subCategoriesMap[categoryId] ?? [];
+        return subCategories
+            .map((sub) => (sub['subCategoryName'] ?? sub['name'])?.toString() ?? '')
+            .where((name) => name.isNotEmpty)
+            .toList();
       }
     }
-    return serviceWithTypes[service] ?? [];
+
+    return [];
   }
 
   final List<String> languages = [
@@ -138,8 +143,8 @@ class EditServiceController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchCategories(); // Fetch all categories first
     getProviderInformation();
-    // Optional: Fetch location in background without blocking
     getCurrentLocation();
   }
 
@@ -166,7 +171,80 @@ class EditServiceController extends GetxController {
     return assetImages.length + uploadedImages.length;
   }
 
-  // Optional: Get current location in background (non-blocking)
+  // Fetch all categories from API
+  Future<void> fetchCategories() async {
+    try {
+      print("Fetching all categories...");
+
+      final response = await ApiService.get(
+        ApiEndPoint.category,
+        header: {"Authorization": "Bearer ${LocalStorage.token}"},
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['success'] == true && data['data'] != null) {
+          categories.value = List<Map<String, dynamic>>.from(data['data']);
+          print("All categories loaded: ${categories.length}");
+          update();
+        }
+      }
+    } catch (e) {
+      print("Error fetching categories: $e");
+      Get.snackbar("Error", "Failed to load categories");
+    }
+  }
+
+  // Fetch subcategories for a specific category
+  Future<void> fetchSubCategories(String categoryId) async {
+    try {
+      isLoadingSubCategories[categoryId] = true;
+      isLoadingSubCategories.refresh();
+
+      print("Fetching subcategories for category: $categoryId");
+
+      final response = await ApiService.get(
+        "${ApiEndPoint.subCategory}?category=$categoryId",
+        header: {"Authorization": "Bearer ${LocalStorage.token}"},
+      );
+
+      print("Subcategory response status: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['success'] == true && data['data'] != null) {
+          subCategoriesMap[categoryId] = List<Map<String, dynamic>>.from(
+            data['data'],
+          );
+          subCategoriesMap.refresh();
+          print(
+            "Subcategories loaded: ${subCategoriesMap[categoryId]?.length ?? 0}",
+          );
+        } else {
+          print("No subcategories found for category: $categoryId");
+          subCategoriesMap[categoryId] = [];
+          subCategoriesMap.refresh();
+        }
+      }
+    } catch (e) {
+      print("Error fetching subcategories: $e");
+      subCategoriesMap[categoryId] = [];
+      subCategoriesMap.refresh();
+    } finally {
+      isLoadingSubCategories[categoryId] = false;
+      isLoadingSubCategories.refresh();
+    }
+  }
+
+  List<Map<String, dynamic>> getSubCategoriesForCategory(String categoryId) {
+    return subCategoriesMap[categoryId] ?? [];
+  }
+
+  bool isSubCategoriesLoading(String categoryId) {
+    return isLoadingSubCategories[categoryId] ?? false;
+  }
+
+  // Get current location
   Future<void> getCurrentLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -199,7 +277,6 @@ class EditServiceController extends GetxController {
       update();
     } catch (e) {
       print("Failed to get location: $e (using default coordinates)");
-      // Keep using default coordinates
     }
   }
 
@@ -219,26 +296,42 @@ class EditServiceController extends GetxController {
     update();
   }
 
-  void selectFromDropdown(TextEditingController controller, String value) {
+  void selectFromDropdown(TextEditingController controller, String value) async {
     controller.text = value;
+
     for (var pair in servicePairs) {
       if (pair.serviceController == controller) {
         // Service selected - clear service type and update category ID
         pair.serviceTypeController.clear();
         pair.subCategoryId = null;
-        final category = categories.firstWhereOrNull((cat) => cat.name == value);
+
+        // Find category by name
+        final category = categories.firstWhereOrNull(
+              (cat) => cat['name'] == value,
+        );
+
         if (category != null) {
-          pair.categoryId = category.id;
+          String categoryId = category['_id'] ?? category['id'] ?? '';
+          pair.categoryId = categoryId;
+
+          // Fetch subcategories for this category
+          if (categoryId.isNotEmpty) {
+            await fetchSubCategories(categoryId);
+          }
         }
         break;
       } else if (pair.serviceTypeController == controller) {
         // Service type selected - update subcategory ID
         final categoryId = pair.categoryId;
-        if (categoryId != null) {
+        if (categoryId != null && categoryId.isNotEmpty) {
           final subCategories = subCategoriesMap[categoryId] ?? [];
-          final subCategory = subCategories.firstWhereOrNull((sub) => sub.name == value);
+          final subCategory = subCategories.firstWhereOrNull(
+                (sub) => (sub['subCategoryName'] ?? sub['name']) == value,
+          );
           if (subCategory != null) {
-            pair.subCategoryId = subCategory.id;
+            String subCategoryId = subCategory['_id'] ?? subCategory['id'] ?? '';
+            pair.subCategoryId = subCategoryId;
+            print("SubCategory selected: $value (ID: $subCategoryId)");
           }
         }
         break;
@@ -436,16 +529,13 @@ class EditServiceController extends GetxController {
       return false;
     }
 
-    // Validate price per hour is a valid number
     if (double.tryParse(pricePerHourController.text.trim()) == null) {
       Get.snackbar("Error", "Price Per Hour must be a valid number");
       return false;
     }
 
-    // Note: We don't validate images here because previousServiceImages can satisfy the requirement
-    // Backend will validate if at least one image exists (new or previous)
-
-    // Validate all service pairs
+    // Check for duplicate services
+    Set<String> uniqueServices = {};
     for (int i = 0; i < servicePairs.length; i++) {
       var pair = servicePairs[i];
 
@@ -459,12 +549,22 @@ class EditServiceController extends GetxController {
         return false;
       }
 
+      // Check for duplicate service combination
+      String serviceKey = "${pair.categoryId}_${pair.subCategoryId}";
+      if (uniqueServices.contains(serviceKey)) {
+        Get.snackbar(
+            "Error",
+            "Duplicate service found: ${pair.serviceController.text} - ${pair.serviceTypeController.text}. Please remove duplicate services."
+        );
+        return false;
+      }
+      uniqueServices.add(serviceKey);
+
       if (pair.priceController.text.trim().isEmpty) {
         Get.snackbar("Error", "Please enter price for Service ${i + 1}");
         return false;
       }
 
-      // Validate price is a valid number
       if (double.tryParse(pair.priceController.text.trim()) == null) {
         Get.snackbar("Error", "Price for Service ${i + 1} must be a valid number");
         return false;
@@ -553,7 +653,6 @@ class EditServiceController extends GetxController {
       print("=== Edit Profile Data ===");
       print("Data Object: ${jsonEncode(dataObject)}");
       print("Services Object: ${jsonEncode(servicesObject)}");
-      print("Services Object Type: ${servicesObject.runtimeType}");
       print("Previous Service Images: ${assetImages.toList()}");
       print("Uploaded Images Count: ${uploadedImages.length}");
 
@@ -596,8 +695,6 @@ class EditServiceController extends GetxController {
       print("=== FormData Summary ===");
       print("Fields count: ${formData.fields.length}");
       print("Files count: ${formData.files.length}");
-      print("Field names: ${formData.fields.map((e) => e.key).join(', ')}");
-      print("File field names: ${formData.files.map((e) => e.key).join(', ')}");
 
       // Make API call
       final response = await _makeMultipartRequest(
@@ -646,7 +743,7 @@ class EditServiceController extends GetxController {
     }
   }
 
-// Custom method to handle FormData with multiple images
+  // Custom method to handle FormData with multiple images
   Future<ApiResponseModel> _makeMultipartRequest(
       String url,
       FormData formData,
@@ -655,7 +752,6 @@ class EditServiceController extends GetxController {
     try {
       Dio dio = Dio();
 
-      // Add base URL and default settings
       dio.options.baseUrl = ApiEndPoint.baseUrl;
       dio.options.connectTimeout = const Duration(seconds: 30);
       dio.options.receiveTimeout = const Duration(seconds: 30);
@@ -665,7 +761,6 @@ class EditServiceController extends GetxController {
       print("URL: ${ApiEndPoint.baseUrl}$url");
       print("Method: PUT");
 
-      // Use PUT method for updating existing provider
       final response = await dio.put(
         url,
         data: formData,
@@ -724,7 +819,8 @@ class EditServiceController extends GetxController {
         final data = response.data['data'];
         providerData.value = ProviderData.fromJson(data);
 
-        extractCategoriesAndSubCategories(providerData.value!);
+        // Don't extract categories from provider data anymore
+        // We'll use all categories from the API
         populateFormWithData(providerData.value!);
 
         print("Provider Data loaded successfully");
@@ -735,30 +831,6 @@ class EditServiceController extends GetxController {
       isLoading.value = false;
       Utils.errorSnackBar(0, e.toString());
       print("Error: $e");
-    }
-  }
-
-  void extractCategoriesAndSubCategories(ProviderData data) {
-    categories.clear();
-    subCategoriesMap.clear();
-
-    if (data.services != null && data.services!.isNotEmpty) {
-      for (var service in data.services!) {
-        if (service.category != null &&
-            !categories.any((cat) => cat.id == service.category!.id)) {
-          categories.add(service.category!);
-        }
-
-        if (service.category?.id != null && service.subCategory != null) {
-          if (!subCategoriesMap.containsKey(service.category!.id)) {
-            subCategoriesMap[service.category!.id!] = [];
-          }
-          if (!subCategoriesMap[service.category!.id!]!
-              .any((sub) => sub.id == service.subCategory!.id)) {
-            subCategoriesMap[service.category!.id!]!.add(service.subCategory!);
-          }
-        }
-      }
     }
   }
 
@@ -810,6 +882,11 @@ class EditServiceController extends GetxController {
         }
 
         servicePairs.add(pair);
+
+        // Pre-fetch subcategories for existing services
+        if (pair.categoryId != null && pair.categoryId!.isNotEmpty) {
+          fetchSubCategories(pair.categoryId!);
+        }
       }
     } else {
       servicePairs.add(ServicePair());

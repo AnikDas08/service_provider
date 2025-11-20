@@ -12,6 +12,7 @@ import 'package:haircutmen_user_app/utils/constants/app_string.dart';
 
 import '../../../../component/text/common_text.dart';
 import '../../../../utils/constants/app_colors.dart';
+import '../../../home/presentation/controller/home_controller.dart';
 import '../controller/message_controller.dart';
 
 class MessageScreen extends StatelessWidget {
@@ -84,7 +85,10 @@ class MessageScreen extends StatelessWidget {
           size: 24.sp,
           color: AppColors.textColor,
         ),
-        onPressed: () => Get.back(),
+        onPressed: () {
+          Get.find<HomeController>().updateMessage(0);
+          Get.back();
+        },
       ),
       title: Row(
         children: [

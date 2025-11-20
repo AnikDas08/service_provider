@@ -91,48 +91,50 @@ class HomeScreen extends StatelessWidget {
                         onTap: () {
                           Get.toNamed(AppRoutes.notifications);
                         },
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Icon(
-                              Icons.notifications_outlined,
-                              color: AppColors.black300,
-                              size: 24.sp,
-                            ),
-                            // Notification Badge
-                            Positioned(
-                              right: -4.w,
-                              top: -4.h,
-                              child: Container(
-                                padding: EdgeInsets.all(4.w),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: AppColors.background,
-                                    width: 1.5.w,
-                                  ),
-                                ),
-                                constraints: BoxConstraints(
-                                  minWidth: 16.w,
-                                  minHeight: 16.h,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '5',
-                                    style: TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 9.sp,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
+                        child: Obx(
+                              () => Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Icon(
+                                Icons.notifications_outlined,
+                                color: AppColors.black300,
+                                size: 24.sp,
                               ),
-                            ),
-                          ],
-                        ),
+                              if (controller.notificationCount.value > 0)
+                                Positioned(
+                                  right: -4.w,
+                                  top: -4.h,
+                                  child: Container(
+                                    padding: EdgeInsets.all(4.w),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.background,
+                                        width: 1.5.w,
+                                      ),
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 16.w,
+                                      minHeight: 16.h,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        controller.notificationCount.value.toString(),
+                                        style: TextStyle(
+                                          color: AppColors.white,
+                                          fontSize: 9.sp,
+                                          fontWeight: FontWeight.w600,
+                                          height: 1,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        )
+
                       ),
                     ],
                   ),

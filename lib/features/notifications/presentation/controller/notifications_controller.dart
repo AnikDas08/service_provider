@@ -56,6 +56,19 @@ class NotificationsController extends GetxController {
       }
     });
   }
+  readNotification()async{
+    try{
+      final response = await ApiService.patch(
+        "notifications/read",
+        header: {
+          "Content-Type": "application/json",
+        }
+      );
+    }
+    catch(e){
+
+    }
+  }
 
   /// Notification data Loading function
   getNotificationsRepo() async {
@@ -70,6 +83,7 @@ class NotificationsController extends GetxController {
     } else {
       notifications.addAll(list);
     }
+    await readNotification();
     isLoading = false;
     update();
   }

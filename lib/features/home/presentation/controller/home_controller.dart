@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/features/home/presentation/controller/home_nav_controller.dart';
 import '../../../../component/text/common_text.dart';
 import '../../../../config/api/api_end_point.dart';
 import '../../../../services/api/api_service.dart';
@@ -14,6 +15,8 @@ class HomeController extends GetxController {
   // Loading state
   bool isLoading = false;
   bool isLoadingMore = false;
+  RxInt notificationCount = 0.obs;
+  RxInt message = 0.obs;
 
   // Online status
   bool isOnline = true;
@@ -62,12 +65,60 @@ class HomeController extends GetxController {
     fetchAllBookings();
     getProfile();
     getOnlineStatus();
+    countNotification();
+    countMessa();
   }
 
   @override
   void onClose() {
     scrollController.dispose();
     super.onClose();
+  }
+
+  void updateCount(int count) {
+    notificationCount.value = count;
+    print("data :$count");
+  }
+
+
+  Future<void> countNotification()async{
+    try{
+      final response = await ApiService.get(
+          "notifications/amount",
+          header: {
+            "Content-Type": "application/json",
+          }
+      );
+      if(response.statusCode==200){
+        updateCount(response.data['data']);
+      }
+    }
+    catch(e){
+
+    }
+  }
+
+  void updateMessage(int count) {
+    message.value = count;
+    print("values :$message");
+  }
+
+  Future<void> countMessa()async{
+    try{
+      final response = await ApiService.get(
+          "messages/get-unread-messages-amount",
+          header: {
+            "Content-Type": "application/json",
+          }
+      );
+      if(response.statusCode==200){
+        updateMessage(response.data['data']);
+        Get.find<HomeNavController>().refresh();
+      }
+    }
+    catch(e){
+
+    }
   }
 
   // Setup scroll listener for infinite scroll
