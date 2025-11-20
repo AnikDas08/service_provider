@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:haircutmen_user_app/component/text/common_text.dart';
 import 'package:haircutmen_user_app/features/home/presentation/controller/home_nav_controller.dart';
 import 'package:haircutmen_user_app/features/home/presentation/screen/home_screen.dart';
 import 'package:haircutmen_user_app/features/message/presentation/screen/chat_screen.dart';
@@ -83,7 +84,44 @@ class HomeNavScreen extends StatelessWidget {
                 return BottomNavigationBarItem(
                   icon: Padding(
                     padding: const EdgeInsets.only(top: 8, bottom: 6),
-                    child: SvgPicture.asset(
+                    child:
+                    _navItems[index]["label"] == AppString.message
+                        ? Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        SvgPicture.asset(
+                          _navItems[index]["icon"]!,
+                          width: isSelected ? 28.w : 24.w,
+                          height: isSelected ? 28.h : 24.h,
+                          colorFilter: ColorFilter.mode(
+                            isSelected ? AppColors.primaryColor : Colors.black,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+
+                        /// 🔴 PERFECT BADGE
+                        Positioned(
+                          right: -6.r,   // Proper right alignment
+                          top: -8.r,     // Proper top alignment
+                          child: Container(
+                            padding: EdgeInsets.all(4.r), // Ensures circle shape
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: CommonText(
+                              text: "3",      // dynamic value here
+                              color: Colors.white,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                        :
+
+                    SvgPicture.asset(
                       _navItems[index]["icon"]!,
                       width: isSelected ? 28.w : 24.w,
                       height: isSelected ? 28.h : 24.h,

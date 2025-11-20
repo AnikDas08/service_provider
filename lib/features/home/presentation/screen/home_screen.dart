@@ -91,10 +91,47 @@ class HomeScreen extends StatelessWidget {
                         onTap: () {
                           Get.toNamed(AppRoutes.notifications);
                         },
-                        child: Icon(
-                          Icons.notifications_outlined,
-                          color: AppColors.black300,
-                          size: 24.sp,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Icon(
+                              Icons.notifications_outlined,
+                              color: AppColors.black300,
+                              size: 24.sp,
+                            ),
+                            // Notification Badge
+                            Positioned(
+                              right: -4.w,
+                              top: -4.h,
+                              child: Container(
+                                padding: EdgeInsets.all(4.w),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.background,
+                                    width: 1.5.w,
+                                  ),
+                                ),
+                                constraints: BoxConstraints(
+                                  minWidth: 16.w,
+                                  minHeight: 16.h,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '5',
+                                    style: TextStyle(
+                                      color: AppColors.white,
+                                      fontSize: 9.sp,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -115,46 +152,88 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: TableCalendar<Event>(
-                    firstDay: DateTime.utc(2020, 1, 1),
-                    lastDay: DateTime.utc(2030, 12, 31),
-                    focusedDay: controller.focusedDay,
-                    selectedDayPredicate: (day) {
-                      return isSameDay(controller.selectedDay, day);
-                    },
-                    calendarFormat: CalendarFormat.week,
-                    startingDayOfWeek: StartingDayOfWeek.sunday,
-                    onDaySelected: controller.onDaySelected,
-                    onPageChanged: (focusedDay) {
-                      controller.onPageChanged(focusedDay);
-                    },
-                    calendarStyle: CalendarStyle(
-                      outsideDaysVisible: false,
-                      selectedDecoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                      todayDecoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      defaultTextStyle: TextStyle(fontSize: 14.sp),
-                      weekendTextStyle: TextStyle(fontSize: 14.sp),
-                      selectedTextStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    headerStyle: HeaderStyle(
-                      formatButtonVisible: false,
-                      titleCentered: true,
-                      leftChevronVisible: true,
-                      rightChevronVisible: true,
-                      titleTextStyle: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryColor,
+                  child: Opacity(
+                    opacity: controller.selectedFilter != 0 ? 0.5 : 1.0, // Gray out when not Upcoming
+                    child: IgnorePointer(
+                      ignoring: controller.selectedFilter != 0, // Disable interaction when not Upcoming
+                      child: TableCalendar<Event>(
+                        firstDay: DateTime.utc(2020, 1, 1),
+                        lastDay: DateTime.utc(2030, 12, 31),
+                        focusedDay: controller.focusedDay,
+                        selectedDayPredicate: (day) {
+                          // Only show selection for Upcoming filter
+                          if (controller.selectedFilter != 0) {
+                            return false;
+                          }
+                          return isSameDay(controller.selectedDay, day);
+                        },
+                        calendarFormat: CalendarFormat.week,
+                        startingDayOfWeek: StartingDayOfWeek.sunday,
+                        onDaySelected: controller.selectedFilter == 0
+                            ? controller.onDaySelected
+                            : null, // Disable callback when not Upcoming
+                        onPageChanged: (focusedDay) {
+                          if (controller.selectedFilter == 0) {
+                            controller.onPageChanged(focusedDay);
+                          }
+                        },
+                        calendarStyle: CalendarStyle(
+                          outsideDaysVisible: false,
+                          selectedDecoration: BoxDecoration(
+                            color: controller.selectedFilter == 0
+                                ? AppColors.primaryColor
+                                : Colors.grey.shade400,
+                            shape: BoxShape.circle,
+                          ),
+                          todayDecoration: BoxDecoration(
+                            color: controller.selectedFilter == 0
+                                ? AppColors.primaryColor.withOpacity(0.5)
+                                : Colors.grey.shade300,
+                            shape: BoxShape.circle,
+                          ),
+                          defaultTextStyle: TextStyle(
+                            fontSize: 14.sp,
+                            color: controller.selectedFilter != 0
+                                ? Colors.grey.shade400
+                                : Colors.black,
+                          ),
+                          weekendTextStyle: TextStyle(
+                            fontSize: 14.sp,
+                            color: controller.selectedFilter != 0
+                                ? Colors.grey.shade400
+                                : Colors.black,
+                          ),
+                          selectedTextStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        headerStyle: HeaderStyle(
+                          formatButtonVisible: false,
+                          titleCentered: true,
+                          leftChevronVisible: controller.selectedFilter == 0,
+                          rightChevronVisible: controller.selectedFilter == 0,
+                          titleTextStyle: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            color: controller.selectedFilter == 0
+                                ? AppColors.primaryColor
+                                : Colors.grey.shade400,
+                          ),
+                          leftChevronIcon: Icon(
+                            Icons.chevron_left,
+                            color: controller.selectedFilter == 0
+                                ? AppColors.primaryColor
+                                : Colors.grey.shade400,
+                          ),
+                          rightChevronIcon: Icon(
+                            Icons.chevron_right,
+                            color: controller.selectedFilter == 0
+                                ? AppColors.primaryColor
+                                : Colors.grey.shade400,
+                          ),
+                        ),
                       ),
                     ),
                   ),

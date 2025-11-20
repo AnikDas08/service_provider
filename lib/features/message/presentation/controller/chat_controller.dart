@@ -123,6 +123,21 @@ class ChatControllers extends GetxController {
     }
   }
 
+  Future<void> refreshChatList() async {
+    // Reset page to 1
+    page = 1;
+
+    // Clear existing chats
+    chats.clear();
+    filteredChats.clear();
+
+    // Fetch fresh data
+    await getChatRepo();
+
+    // Small delay to ensure smooth animation
+    await Future.delayed(Duration(milliseconds: 300));
+  }
+
   /// Chat data Update Socket listener
   listenChat() async {
     SocketServices.on("update-chatlist::${LocalStorage.userId}", (data) {

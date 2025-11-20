@@ -36,105 +36,116 @@ class ChatListScreen extends StatelessWidget {
           automaticallyImplyLeading: false,
           elevation: 0,
         ),
-        body: Column(
-          children: [
-            // Search Bar
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              child: GetBuilder<ChatControllers>(
-                builder: (_) {
-                  return Container(
-                    height: 38.h,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.black.withOpacity(0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 12.w),
-                          child: Icon(
-                            CupertinoIcons.search,
-                            size: 18.sp,
-                            color: AppColors.black100,
+        body: GetBuilder<ChatControllers>(
+          builder: (_) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                await controller.refreshChatList();
+              },
+              color: AppColors.red500,
+              backgroundColor: Colors.white,
+              child: Column(
+                children: [
+                  // Search Bar
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    child: Container(
+                      height: 38.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
                           ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: TextField(
-                            controller: controller.searchController,
-                            onChanged: (value) {
-                              controller.searchByName(value);
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 12.w),
+                            child: Icon(
+                              CupertinoIcons.search,
+                              size: 18.sp,
+                              color: AppColors.black100,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: TextField(
+                              controller: controller.searchController,
+                              onChanged: (value) {
+                                controller.searchByName(value);
+                              },
+                              decoration: InputDecoration(
+                                hintText: AppString.search_text,
+                                hintStyle: GoogleFonts.roboto(
+                                  fontSize: 14.sp,
+                                  color: AppColors.black100,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                                isDense: true,
+                              ),
+                            ),
+                          ),
+                          controller.searchController.text.isNotEmpty
+                              ? IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              size: 18.sp,
+                              color: AppColors.black100,
+                            ),
+                            onPressed: () {
+                              controller.clearSearch();
                             },
-                            decoration: InputDecoration(
-                              hintText: AppString.search_text,
-                              hintStyle: GoogleFonts.roboto(
+                          )
+                              : SizedBox.shrink(),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Message List
+                  Expanded(
+                    child: controller.filteredChats.isEmpty
+                        ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).size.height - 200.h,
+                          child: Center(
+                            child: Text(
+                              controller.searchController.text.isNotEmpty
+                                  ? "No chats found"
+                                  : AppString.messageNot,
+                              style: GoogleFonts.roboto(
                                 fontSize: 14.sp,
                                 color: AppColors.black100,
-                                fontWeight: FontWeight.w400,
                               ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
                             ),
                           ),
                         ),
-                        controller.searchController.text.isNotEmpty
-                            ? IconButton(
-                          icon: Icon(
-                            Icons.close,
-                            size: 18.sp,
-                            color: AppColors.black100,
-                          ),
-                          onPressed: () {
-                            controller.clearSearch();
-                          },
-                        )
-                            : SizedBox.shrink(),
                       ],
+                    )
+                        : ListView.builder(
+                      controller: controller.scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: controller.filteredChats.length,
+                      itemBuilder: (context, index) {
+                        ChatModel message = controller.filteredChats[index];
+                        return _buildMessageItem(message);
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-
-            // Message List
-            Expanded(
-              child: GetBuilder<ChatControllers>(
-                builder: (_) {
-                  if (controller.filteredChats.isEmpty) {
-                    return Center(
-                      child: Text(
-                        controller.searchController.text.isNotEmpty
-                            ? "No chats found"
-                            : AppString.messageNot,
-                        style: GoogleFonts.roboto(
-                          fontSize: 14.sp,
-                          color: AppColors.black100,
-                        ),
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    controller: controller.scrollController,
-                    itemCount: controller.filteredChats.length,
-                    itemBuilder: (context, index) {
-                      ChatModel message = controller.filteredChats[index];
-                      return _buildMessageItem(message);
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
