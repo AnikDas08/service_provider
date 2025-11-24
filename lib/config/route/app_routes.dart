@@ -92,7 +92,7 @@ class AppRoutes {
     GetPage(name: favorite, page: () => const FavoriteScreen()),
     GetPage(name: upcomingdetail_sscreen, page: () => const ViewDetailsUpcoming()),
     GetPage(name: view_detail_pending, page: () => const ViewDetailsPending()),
-    GetPage(name: canceldetails_screen, page: () => const CancelDetailsScreen()),
+    GetPage(name: canceldetails_screen, page: () => const CanceldetailsScreen()),
     GetPage(name: complete_profile_screen, page: () => const CompleteProfileScreen()),
     GetPage(name: personal_information, page: () => const PersonalInformationScreen()),
     GetPage(name: service_person_screen, page: () =>  ServiceProfileScreen()),

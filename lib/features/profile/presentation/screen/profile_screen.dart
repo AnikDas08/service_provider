@@ -53,12 +53,31 @@ class ProfileScreen extends StatelessWidget {
                     child: Center(
                       child: Obx(
                         ()=> CircleAvatar(
-                          radius: 60.sp,
+                          radius: 60.r,
                           backgroundColor: Colors.transparent,
-                          backgroundImage: controller.images.value == ""
-                              ? const AssetImage("assets/images/profile_image.jpg") as ImageProvider
-                              : NetworkImage(ApiEndPoint.socketUrl + controller.images.value),
-                        ),
+                          child: ClipOval(
+                            child: controller.images.value != ""?Image.network(
+                              ApiEndPoint.socketUrl + controller.images.value,
+                              width: 120.w,
+                              height: 120.h,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  "assets/images/profile_image.jpg",
+                                  width: 120.w,
+                                  height: 120.h,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ):Image.asset(
+                              "assets/images/profile_image.jpg",
+                              width: 120.w,
+                              height: 120.h,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        )
+                        ,
                       )
 
                     ),

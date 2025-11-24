@@ -35,12 +35,32 @@ class HomeScreen extends StatelessWidget {
                       // Profile Image
                       Obx(
                             () => CircleAvatar(
-                          radius: 24.r,
-                          backgroundImage: controller.image.value != ""
-                              ? NetworkImage(ApiEndPoint.socketUrl + controller.image.value)
-                              : const AssetImage("assets/images/profile_image.jpg") as ImageProvider,
-                          backgroundColor: Colors.transparent,
-                        ),
+                              radius: 24.r,
+                              backgroundColor: Colors.transparent,
+                              child: ClipOval(
+                                child: controller.image.value != ""
+                                    ? Image.network(
+                                  ApiEndPoint.socketUrl + controller.image.value,
+                                  width: 48.w,
+                                  height: 48.h,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      "assets/images/profile_image.jpg",
+                                      width: 48.w,
+                                      height: 48.h,
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                ):
+                                Image.asset(
+                                  "assets/images/profile_image.jpg",
+                                  width: 48.w,
+                                  height: 48.h,
+                                  fit: BoxFit.cover,
+                                )
+                              ),
+                            )
                       ),
                       SizedBox(width: 12.w),
                       // Profile Info
@@ -380,7 +400,12 @@ class HomeScreen extends StatelessWidget {
             AppRoutes.view_detail_pending,
             arguments: {'bookingId': controller.getFullBookingId(booking)},
           );
-        } else {}
+        } else {
+          Get.toNamed(
+            AppRoutes.canceldetails_screen,
+            arguments: {'bookingId': controller.getFullBookingId(booking)},
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 12.h),

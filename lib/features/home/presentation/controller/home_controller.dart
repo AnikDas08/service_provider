@@ -121,6 +121,7 @@ class HomeController extends GetxController {
     }
   }
 
+
   // Setup scroll listener for infinite scroll
   void setupScrollListener() {
     scrollController.addListener(() {
@@ -381,9 +382,16 @@ class HomeController extends GetxController {
   String getFormattedDate(Map<String, dynamic> booking) {
     if (booking['date'] != null) {
       try {
-        DateTime date = DateTime.parse(booking['date']);
-        return '${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}.${date.year}';
+        // Parse UTC date from API
+        DateTime dateUtc = DateTime.parse(booking['date']);
+
+        // ✅ FIX: Convert UTC to Local date
+        // This ensures the date displays correctly in user's timezone
+        DateTime dateLocal = dateUtc.toLocal();
+
+        return '${dateLocal.month.toString().padLeft(2, '0')}.${dateLocal.day.toString().padLeft(2, '0')}.${dateLocal.year}';
       } catch (e) {
+        print('Error parsing date: $e');
         return '08.22.2025';
       }
     }
@@ -397,20 +405,63 @@ class HomeController extends GetxController {
         List<String> timeSlots = [];
 
         for (var slot in booking['slots']) {
-          DateTime startTime = DateTime.parse(slot['start']);
-          int hour = startTime.hour;
-          int minute = startTime.minute;
-          String formattedTime = '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+          // Parse UTC time from API
+          DateTime startTimeUtc = DateTime.parse(slot['start']);
+
+          // ✅ FIX: Convert UTC to Local time
+          DateTime startTimeLocal = startTimeUtc.toLocal();
+
+          // Use LOCAL time for display
+          int hour = startTimeLocal.hour;
+          int minute = startTimeLocal.minute;
+
+          String formattedTime =
+              '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
           timeSlots.add(formattedTime);
         }
 
         // Join all time slots with comma
         return timeSlots.join(', ');
       } catch (e) {
+        print('Error parsing time: $e');
         return '10:00';
       }
     }
     return '10:00';
+  }
+
+  String getFormattedTimeRange(Map<String, dynamic> booking) {
+    if (booking['slots'] != null && booking['slots'].isNotEmpty) {
+      try {
+        List<String> timeSlots = [];
+
+        for (var slot in booking['slots']) {
+          // Parse UTC times from API
+          DateTime startTimeUtc = DateTime.parse(slot['start']);
+          DateTime endTimeUtc = DateTime.parse(slot['end']);
+
+          // Convert UTC to Local time
+          DateTime startTimeLocal = startTimeUtc.toLocal();
+          DateTime endTimeLocal = endTimeUtc.toLocal();
+
+          // Format start time
+          String startFormatted =
+              '${startTimeLocal.hour.toString().padLeft(2, '0')}:${startTimeLocal.minute.toString().padLeft(2, '0')}';
+
+          // Format end time
+          String endFormatted =
+              '${endTimeLocal.hour.toString().padLeft(2, '0')}:${endTimeLocal.minute.toString().padLeft(2, '0')}';
+
+          timeSlots.add('$startFormatted - $endFormatted');
+        }
+
+        return timeSlots.join(', ');
+      } catch (e) {
+        print('Error parsing time: $e');
+        return '10:00 - 11:00';
+      }
+    }
+    return '10:00 - 11:00';
   }
 
   // Get booking ID (last 4 digits)

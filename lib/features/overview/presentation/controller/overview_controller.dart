@@ -367,32 +367,35 @@ class OverviewController extends GetxController {
     DateTime baseDate = selectedDay.value ?? DateTime.now();
     DateTime startDate = DateTime(baseDate.year, baseDate.month, baseDate.day);
 
-    // Reset ALL working days and times BEFORE applying new schedules
     workingDays.updateAll((key, value) => false);
     workingTimes.updateAll((key, value) => {"start": "", "end": ""});
 
     print("🔍 Applying schedules for next 7 days starting from: ${_formatDateForComparison(startDate)}");
 
-    // Get the NEXT 7 days starting from selected date
     for (int i = 0; i < 7; i++) {
       DateTime currentDate = startDate.add(Duration(days: i));
       String dateStr = _formatDateForComparison(currentDate);
       String dayName = _getDayNameFromWeekday(currentDate.weekday);
 
-      // Find schedule for this EXACT date
+      // ✅ Compare using UTC date directly (since we store same calendar date in UTC)
       var schedule = scheduleList.firstWhereOrNull((s) {
-        String scheduleDateStr = _formatDateForComparison(DateTime.parse(s['date']));
+        DateTime scheduleDateUtc = DateTime.parse(s['date']).toUtc();
+        // Extract just the date part from UTC (year-month-day)
+        String scheduleDateStr = "${scheduleDateUtc.year}-${scheduleDateUtc.month.toString().padLeft(2, '0')}-${scheduleDateUtc.day.toString().padLeft(2, '0')}";
         return scheduleDateStr == dateStr;
       });
 
       if (schedule != null) {
-        DateTime startTime = DateTime.parse(schedule['startTime']).toUtc();
-        DateTime endTime = DateTime.parse(schedule['endTime']).toUtc();
+        // Parse UTC time and convert to LOCAL time for display
+        DateTime startTimeUtc = DateTime.parse(schedule['startTime']);
+        DateTime endTimeUtc = DateTime.parse(schedule['endTime']);
 
-        String startTimeStr = "${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}";
-        String endTimeStr = "${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}";
+        DateTime startTimeLocal = startTimeUtc.toLocal();
+        DateTime endTimeLocal = endTimeUtc.toLocal();
 
-        // ✅ Set switch based on isActive from API
+        String startTimeStr = "${startTimeLocal.hour.toString().padLeft(2, '0')}:${startTimeLocal.minute.toString().padLeft(2, '0')}";
+        String endTimeStr = "${endTimeLocal.hour.toString().padLeft(2, '0')}:${endTimeLocal.minute.toString().padLeft(2, '0')}";
+
         bool isActive = schedule['isActive'] ?? false;
         workingDays[dayName] = isActive;
 
@@ -401,7 +404,7 @@ class OverviewController extends GetxController {
           "end": endTimeStr,
         };
 
-        print("✅ Applied schedule for $dayName ($dateStr): $startTimeStr - $endTimeStr | isActive: $isActive");
+        print("✅ Applied schedule for $dayName ($dateStr): $startTimeStr - $endTimeStr (Local) | isActive: $isActive");
       } else {
         workingDays[dayName] = false;
         workingTimes[dayName] = {"start": "", "end": ""};
@@ -411,8 +414,6 @@ class OverviewController extends GetxController {
 
     workingDays.refresh();
     workingTimes.refresh();
-
-    print("🔄 Schedule application complete. Active days: ${workingDays.entries.where((e) => e.value).map((e) => e.key).toList()}");
   }
 
   String _formatDateForComparison(DateTime date) {
@@ -625,7 +626,6 @@ class OverviewController extends GetxController {
 
   // Create Schedule API Call - WITH CORRECT DATE FOR EACH DAY
   Future<void> createSchedule(String day) async {
-    // Validate that times are selected
     if (!workingTimes.containsKey(day)) {
       Get.snackbar(
         'Error',
@@ -651,15 +651,14 @@ class OverviewController extends GetxController {
       return;
     }
 
-    // GET THE CORRECT DATE FOR THIS SPECIFIC DAY (always in the future from selected date)
+    // Get the LOCAL date for this day
     DateTime scheduleDate = getDateForDay(day);
 
-    // Parse time strings (HH:mm format)
     List<String> startParts = startTime.split(':');
     List<String> endParts = endTime.split(':');
 
-    // Create DateTime objects in UTC directly to avoid timezone conversion issues
-    DateTime startDateTime = DateTime.utc(
+    // Create LOCAL DateTime (user's selected time)
+    DateTime startDateTimeLocal = DateTime(
       scheduleDate.year,
       scheduleDate.month,
       scheduleDate.day,
@@ -667,7 +666,7 @@ class OverviewController extends GetxController {
       int.parse(startParts[1]),
     );
 
-    DateTime endDateTime = DateTime.utc(
+    DateTime endDateTimeLocal = DateTime(
       scheduleDate.year,
       scheduleDate.month,
       scheduleDate.day,
@@ -675,19 +674,41 @@ class OverviewController extends GetxController {
       int.parse(endParts[1]),
     );
 
-    // Prepare API body
+    // Handle case where end time is past midnight (next day)
+    if (endDateTimeLocal.isBefore(startDateTimeLocal) ||
+        endDateTimeLocal.isAtSameMomentAs(startDateTimeLocal)) {
+      endDateTimeLocal = endDateTimeLocal.add(Duration(days: 1));
+    }
+
+    // Convert Local to UTC for API
+    DateTime startDateTimeUtc = startDateTimeLocal.toUtc();
+    DateTime endDateTimeUtc = endDateTimeLocal.toUtc();
+
+    // ✅ FIX: Create date as UTC with SAME calendar date (not converted from local)
+    // This ensures Dec 7 local = Dec 7 in UTC date field
+    DateTime scheduleDateUtc = DateTime.utc(
+      scheduleDate.year,
+      scheduleDate.month,
+      scheduleDate.day,
+      0, 0, 0, // midnight UTC
+    );
+
     Map<String, dynamic> body = {
-      "date": DateTime.utc(scheduleDate.year, scheduleDate.month, scheduleDate.day).toIso8601String(),
-      "startTime": startDateTime.toIso8601String(),
-      "endTime": endDateTime.toIso8601String(),
+      "date": scheduleDateUtc.toIso8601String(),  // Will be 2025-12-07T00:00:00.000Z
+      "startTime": startDateTimeUtc.toIso8601String(),
+      "endTime": endDateTimeUtc.toIso8601String(),
       "duration": 60,
     };
 
     try {
       isLoading.value = true;
 
-      print("📅 Creating schedule for $day on date: ${scheduleDate.toString().split(' ')[0]}");
-      print("⏰ Time: $startTime - $endTime");
+      print("📅 Creating schedule for $day");
+      print("📅 Local Date: ${scheduleDate.year}-${scheduleDate.month.toString().padLeft(2, '0')}-${scheduleDate.day.toString().padLeft(2, '0')}");
+      print("📅 Date (UTC): ${scheduleDateUtc.toIso8601String()}");
+      print("⏰ Local Time: $startTime - $endTime");
+      print("⏰ Start UTC: ${startDateTimeUtc.toIso8601String()}");
+      print("⏰ End UTC: ${endDateTimeUtc.toIso8601String()}");
 
       final response = await ApiService.post(
         ApiEndPoint.scheduleProvider,
@@ -707,20 +728,17 @@ class OverviewController extends GetxController {
           colorText: Colors.white,
         );
 
-        // Refresh schedules after creating
         await fetchSchedules();
-
         workingTimes.refresh();
       } else {
         Get.snackbar(
           'Error',
-          'Failed to create schedule. Status: ${response.statusCode}',
+          'Failed to create schedule:${response.message}',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
       }
-
     } catch (e) {
       print("❌ Error: $e");
       Get.snackbar(

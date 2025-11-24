@@ -29,6 +29,7 @@ class HomeNavScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeNavController>();
+    final homeController= Get.find<HomeController>();
 
     return Obx(
           () => Scaffold(
@@ -101,6 +102,7 @@ class HomeNavScreen extends StatelessWidget {
                         ),
 
                         /// 🔴 PERFECT BADGE
+                        if(homeController.message.value > 0)
                         Positioned(
                           right: -6.r,   // Proper right alignment
                           top: -8.r,     // Proper top alignment

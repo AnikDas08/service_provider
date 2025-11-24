@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:haircutmen_user_app/component/other_widgets/common_loader.dart';
 import 'package:haircutmen_user_app/config/api/api_end_point.dart';
 import 'package:haircutmen_user_app/features/message/data/model/message_model.dart';
+import 'package:haircutmen_user_app/features/message/presentation/controller/chat_controller.dart';
 import 'package:haircutmen_user_app/services/storage/storage_services.dart';
 import 'package:haircutmen_user_app/utils/constants/app_string.dart';
 
@@ -86,7 +87,8 @@ class MessageScreen extends StatelessWidget {
           color: AppColors.textColor,
         ),
         onPressed: () {
-          Get.find<HomeController>().updateMessage(0);
+          Get.find<HomeController>().countMessa();
+          Get.find<ChatControllers>().refreshChatList();
           Get.back();
         },
       ),
@@ -164,10 +166,10 @@ class MessageScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                          "assets/images/profile_image.png");
+                          "assets/images/profile_image.jpg",width: 25.w,height: 25.h,);
                     },
                   )
-                      : Image.asset("assets/images/profile_image.png"),
+                      : Image.asset("assets/images/profile_image.jpg",width: 25.w,height: 25.h,),
                 ),
               ),
               SizedBox(width: 8.w),
