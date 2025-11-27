@@ -211,24 +211,89 @@ class ViewDetailsUpcoming extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: CustomButton(
-                  text: AppString.message_text,
-                  fontSize: 18,
-                  isSelected: true,
-                  onTap: () async {
-                    print("Chat id : 😍😍😍😍 ${controller.chatId}");
-                    Get.toNamed(
-                        AppRoutes.message,
-                        parameters: {
-                          "id":controller.chatId
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        text: AppString.cancel_button,
+                        fontSize: 14,
+                        height: 48,
+                        isSelected: false,
+                        onTap: () async {
+                          // Show confirmation dialog
+                          Get.dialog(
+                            AlertDialog(
+                              backgroundColor: AppColors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              title: CommonText(
+                                text: AppString.cancelBooking,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              content: CommonText(
+                                maxLines: 4,
+                                text:
+                                AppString.cancleBookingSure,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              actions: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomButton(
+                                        text: AppString.no_button,
+                                        isSelected: false,
+                                        onTap: () {
+                                          Get.back();
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(width: 25),
+                                    Expanded(
+                                      child: CustomButton(
+                                        text: AppString.yes_button,
+                                        isSelected: true,
+                                        onTap: () async {
+                                          Get.back(); // Close dialog
+                                          await controller.cancelBooking();
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
                         },
-                        arguments: {
-                          "name":controller.userName,
-                          "image":controller.userImage,
-                        });
-                  },
+                      ),
+                    ),
+                    SizedBox(width: 12,),
+                    Expanded(
+                      child: CustomButton(
+                        text: AppString.message_text,
+                        fontSize: 18,
+                        isSelected: true,
+                        onTap: () async {
+                          print("Chat id : 😍😍😍😍 ${controller.chatId}");
+                          Get.toNamed(
+                              AppRoutes.message,
+                              parameters: {
+                                "id":controller.chatId
+                              },
+                              arguments: {
+                                "name":controller.userName,
+                                "image":controller.userImage,
+                              });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              )
+              ),
             ],
           ),
         ),

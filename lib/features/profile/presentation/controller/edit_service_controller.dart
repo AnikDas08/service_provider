@@ -107,6 +107,9 @@ class EditServiceController extends GetxController {
     'English',
     'Russian',
     'Serbian',
+    "German",
+    "Spanish",
+    "Portuguese"
   ];
 
   bool isLanguageSelected(String language) {

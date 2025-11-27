@@ -47,7 +47,7 @@ class CompleteProfileController extends GetxController {
   double longitude = 0.0;
 
   // Static Data
-  final languages = ["English","Russian","Serbian"];
+  final languages = ["English","Russian","Serbian","German","Spanish","Portuguese"];
 
   @override
   void onInit() {

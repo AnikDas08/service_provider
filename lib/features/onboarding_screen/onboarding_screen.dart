@@ -25,13 +25,21 @@ class OnboardingScreen extends StatelessWidget {
               // Top spacing
               60.height,
 
+              CommonText(
+                  text: AppString.partner,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryColor,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+              ),
               // Title Section
-              _buildTitleSection(),
+              //_buildTitleSection(),
               SizedBox(height: 30.h),
 
               // Illustration Sectio_buildIllustrationSection(),
               Image.asset(
-                "assets/images/flash_image_service.png",
+                "assets/images/ob_boarding_image.png",
                 width: 260,
                 height: 190,
               ),

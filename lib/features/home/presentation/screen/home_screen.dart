@@ -110,6 +110,7 @@ class HomeScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           Get.toNamed(AppRoutes.notifications);
+                          Get.find<HomeController>().countNotification();
                         },
                         child: Obx(
                               () => Stack(

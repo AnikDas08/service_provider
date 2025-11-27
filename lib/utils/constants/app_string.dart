@@ -94,6 +94,7 @@ class AppString {
 
   /// On boarding text
   static const String onboarding_text = "Velodora ";
+  static const String partner = "Partner";
 
   /// Login text
   static const String login_text = "Log In";
@@ -253,6 +254,7 @@ class AppString {
   static const String search_text="Search here";
   static const String selected_year="Select Year";
   static const String selected_month="Select Month";
+  static const String appointment="Appointment";
 
 
   /// Profile Screen

@@ -158,6 +158,7 @@ Map<String, String> serbian = {
   AppString.bookingid: "ID rezervacije:",
   AppString.chatid: "ID razgovora:",
   AppString.home: "Početna",
+  AppString.appointment: "Zakazivanje",
   AppString.overview: "Pregled",
   AppString.qr: "QR Kod",
   AppString.message: "Poruka",

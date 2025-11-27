@@ -134,7 +134,7 @@ class HomeNavScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  label: _navItems[index]["label"],
+                  label: _navItems[index]["label"]!.tr,
                 );
               }),
             ),

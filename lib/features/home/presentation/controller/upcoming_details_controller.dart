@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
+import '../../../../config/route/app_routes.dart';
 import '../../../../services/api/api_service.dart';
+import 'home_controller.dart';
 
 class UpcomingViewDetailsController extends GetxController {
   // Loading state - make it observable
@@ -141,6 +143,51 @@ class UpcomingViewDetailsController extends GetxController {
     // Booking ID (last 4 digits)
     if (bookingData['_id'] != null && bookingData['_id'].toString().length >= 4) {
       bookingId.value = bookingData['_id'].toString().substring(bookingData['_id'].toString().length - 4);
+    }
+  }
+
+  Future<void> cancelBooking() async {
+    try {
+      String fullBookingId = bookingData['_id'] ?? '';
+
+      if (fullBookingId.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'Invalid booking ID',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      // Make DELETE API call to cancel booking
+      final response = await ApiService.delete('booking/$fullBookingId');
+
+      if (response.statusCode == 200) {
+        print('Booking cancelled: $fullBookingId');
+
+        Get.find<HomeController>().fetchAllBookings();
+        Get.offAllNamed(AppRoutes.homeNav);
+        Get.snackbar(
+          'Success',
+          'Booking cancelled successfully',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+
+      } else {
+        Get.snackbar(
+          'Error',
+          response.message ?? 'Failed to cancel booking',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+    } catch (e) {
+      print('Error cancelling booking: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to cancel booking',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 

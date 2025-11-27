@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:haircutmen_user_app/features/home/presentation/controller/home_controller.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../services/notification/notification_service.dart';
 import '../../data/model/message_model.dart';
 import '../../../../services/api/api_service.dart';
 import '../../../../services/socket/socket_service.dart';
@@ -180,7 +181,7 @@ class MessageController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Utils.successSnackBar("Success", "Image sent successfully");
+        //Utils.successSnackBar("Success", "Image sent successfully");
         selectedImage = null;
 
         // Optionally add the message to the list immediately
@@ -235,6 +236,7 @@ class MessageController extends GetxController {
     SocketServices.on('getMessage::$chatId', (data) {
       print("socket data : $data");
       Get.find<HomeController>().countMessa();
+      //NotificationService.showNotification(data);
 
       // Check if message already exists to avoid duplicates
       String messageId = data['_id'] ?? '';
@@ -259,7 +261,14 @@ class MessageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent) {
+        if (!isMoreLoading && !isLoading) {
+          getMessageRepo();
+        }
+      }
+    });
     if (Get.arguments != null) {
       name = Get.arguments['name'] ?? '';
       image = Get.arguments['image'] ?? '';
